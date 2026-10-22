@@ -13,4 +13,4 @@ Diario del brain. **Solo crece:** cada entrada se agrega al final con el encabez
 - Hook `SessionStart`: instala `sim/requirements.txt` (numpy 2.5.3, scipy 1.18.1, pandas 3.0.5, matplotlib 3.11.2, control 0.10.2). Instalación limpia en un entorno nuevo: 53 s, sin errores.
 - `scripts/matriz-requisitos.py` genera `salida/matriz-requisitos.csv` (solo encabezados) y `scripts/lint.py` pasa sin errores.
 - Pendiente: competencia y edición, integrantes y frentes, alcance de control, fechas, propiedad del repo.
-- Rama `claude/fervent-gauss-1zksw8` → PR hacia `main` (el repo estaba vacío: `main` se creó con el README como primer commit).
+- Rama `claude/fervent-gauss-1zksw8` → [PR #1](https://github.com/fernadoR212002/Brain-CanSAT/pull/1) hacia `main` (el repo estaba vacío: `main` se creó con el README como primer commit).
