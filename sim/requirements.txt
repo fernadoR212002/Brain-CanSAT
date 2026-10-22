@@ -1,0 +1,7 @@
+# Entorno de simulación del CanSat Brain (lo instala .claude/hooks/session-start.sh en la nube).
+# Versiones fijas para que los resultados se puedan reproducir; para actualizarlas, cámbialas aquí y anótalo en log.md.
+numpy==2.5.3
+scipy==1.18.1
+pandas==3.0.5
+matplotlib==3.11.2
+control==0.10.2
