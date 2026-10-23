@@ -1,0 +1,47 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-settings.json",
+  "permissions": {
+    "allow": [
+      "Bash(git mv raw/inbox/* raw/*)"
+    ],
+    "deny": [
+      "Edit(/raw/mision/**)",
+      "Edit(/raw/revisiones/**)",
+      "Edit(/raw/datasheets/**)",
+      "Edit(/raw/pruebas/**)",
+      "Edit(/raw/vuelos/**)",
+      "Edit(/raw/reuniones/**)",
+      "Edit(/raw/lecturas/**)",
+      "Edit(/raw/datos/**)",
+      "mcp__*Google_Drive__create_file",
+      "mcp__*Google_Drive__update_file",
+      "mcp__*Google_Drive__copy_file",
+      "mcp__*Google_Drive__trash_file",
+      "mcp__*Google_Drive__share_file",
+      "mcp__*Notion__notion-create-*",
+      "mcp__*Notion__notion-update-*",
+      "mcp__*Notion__notion-delete-*",
+      "mcp__*Notion__notion-move-pages",
+      "mcp__*Notion__notion-duplicate-page",
+      "mcp__*Notion__notion-restore-pages",
+      "mcp__*Notion__notion-set-*",
+      "mcp__*Notion__notion-upload-skill",
+      "mcp__*Notion__notion-convert-page-to-skill",
+      "mcp__*Notion__notion-calendar-create-events",
+      "mcp__*Notion__notion-calendar-update-events",
+      "mcp__*Notion__notion-calendar-cancel-events"
+    ]
+  },
+  "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"$CLAUDE_PROJECT_DIR\"/.claude/hooks/session-start.sh"
+          }
+        ]
+      }
+    ]
+  }
+}
