@@ -31,7 +31,11 @@ Para cada archivo del inbox (sin contar `.gitkeep`):
    | otros datos de referencia | `datos/` | — | solo en `index.md`, o en la nota que lo use |
 
    Siguiente número libre: el mayor de `index.md` (tabla «IDs asignados») y de `log.md`, más uno. Nunca reutilices un número.
-3. **Mover:** `git add raw/inbox/<archivo>` (si no estaba en git) y luego `git mv raw/inbox/<archivo> raw/<subcarpeta>/<id-en-minúsculas>-<nombre-corto>.<ext>`, en minúsculas y con guiones. Si el sistema de permisos bloquea el movimiento, detente y pide al usuario que lo apruebe. No lo rodees con otro comando ni con un script.
+3. **Mover**, en dos comandos separados:
+   - `git add raw/inbox/<archivo>` (si no estaba en git);
+   - `git mv raw/inbox/<archivo> raw/<subcarpeta>/<id-en-minúsculas>-<nombre-corto>.<ext>`, en minúsculas y con guiones, sin opciones y sin encadenarlo con `&&`.
+
+   Así coincide con la regla `allow` `Bash(git mv raw/inbox/* raw/*)` y no pide permiso. Si aun así se bloquea, detente y pide al usuario que lo apruebe. No lo rodees con otro comando ni con un script.
 4. **Extraer el texto, una sola vez:**
    - PDF: `pdfinfo` para contar páginas; si pasa de 30, pregunta qué secciones procesar (y marca `procesado: parcial`). Luego `pdftotext -layout raw/<…>.pdf derivados/<mismo-nombre>.txt`.
    - PDF sin capa de texto o foto con texto: OCR (`pdftoppm -r 300 -png` + `tesseract -l spa+eng`; si `tesseract` no está, avisa y deja `procesado: no`).

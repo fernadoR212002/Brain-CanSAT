@@ -76,7 +76,7 @@ Cadena: RQ → RC → DEC → TST → evidencia en `raw/` → REV.
 ## Permisos y nube
 
 - `.claude/settings.json` niega `Edit` (que cubre también `Write`) en `raw/mision`, `revisiones`, `datasheets`, `pruebas`, `vuelos`, `reuniones`, `lecturas` y `datos`. `raw/inbox/` y `raw/LINKS.md` quedan libres.
-- Ingesta: `git mv raw/inbox/<archivo> raw/<subcarpeta>/<id>-<nombre>`. Es un movimiento, no una edición; si el sistema de permisos lo bloquea, se pide al usuario que lo apruebe y nunca se rodea con otro comando o script.
+- Ingesta: `git mv raw/inbox/<archivo> raw/<subcarpeta>/<id>-<nombre>`, sin opciones y como comando aparte (el `git add` va en otro). La regla `allow` `Bash(git mv raw/inbox/* raw/*)` lo aprueba sin preguntar. Cualquier otro cambio dentro de `raw/` se pide al usuario y nunca se rodea con otro comando o script.
 - Los conectores tienen negadas sus herramientas de escritura (crear, actualizar, borrar, mover o compartir en Drive y Notion).
 - Hook `SessionStart` (`.claude/hooks/session-start.sh`): en la nube instala `sim/requirements.txt` (numpy, scipy, pandas, matplotlib, control).
 

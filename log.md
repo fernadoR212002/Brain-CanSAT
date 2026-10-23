@@ -14,3 +14,10 @@ Diario del brain. **Solo crece:** cada entrada se agrega al final con el encabez
 - `scripts/matriz-requisitos.py` genera `salida/matriz-requisitos.csv` (solo encabezados) y `scripts/lint.py` pasa sin errores.
 - Pendiente: competencia y edición, integrantes y frentes, alcance de control, fechas, propiedad del repo.
 - Rama `claude/fervent-gauss-1zksw8` → [PR #1](https://github.com/fernadoR212002/Brain-CanSAT/pull/1) hacia `main` (el repo estaba vacío: `main` se creó con el README como primer commit).
+
+## 2026-10-22 · ajuste · Regla allow para git mv desde raw/inbox/
+
+- El líder de control aprobó agregar a `.claude/settings.json` la regla `allow` `Bash(git mv raw/inbox/* raw/*)`. Resuelve el bloqueo de la ingesta que quedó pendiente en la entrada anterior.
+- Comprobado: `git mv raw/inbox/prueba-permiso.md raw/mision/prueba-permiso.md` pasa sin preguntar y editar el archivo ya movido sigue negado. El archivo de prueba se borró sin llegar a ningún commit.
+- La regla solo cubre `git mv` con origen en `raw/inbox/` y destino en `raw/`. Un `git mv` con opciones delante (`-f`) o con otro origen no coincide y se pide al usuario.
+- Actualizados `CLAUDE.md` (permisos y nube) y la skill `subir` (paso 3: `git add` y `git mv` en comandos separados).
