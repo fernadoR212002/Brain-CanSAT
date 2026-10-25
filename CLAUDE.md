@@ -70,14 +70,14 @@ Cadena: RQ → RC → DEC → TST → evidencia en `raw/` → REV.
 6. Si un cambio toca más de 5 archivos, mostrar antes el plan en 5 líneas.
 7. Repo privado. No subir datos de terceros (datos personales, material de otros equipos, contenido con licencia) sin preguntar.
 8. Trabajo en rama y Pull Request hacia `main`. Al cerrar: `estado.md`, entrada en `log.md`, lint, push y enlace al PR.
-9. Conectores (Google Drive, Notion): solo lectura. Lo que se use se congela antes de citarlo: copia por `raw/inbox/` o enlace en `raw/LINKS.md`.
+9. Conectores. Google Drive: solo lectura. Notion: lectura, y escritura solo para crear o editar páginas dentro de CANSAT cuando el líder lo pida; nunca borrar ni mover. Lo escrito en Notion es una copia: la fuente de verdad es el brain. Lo que se use de un conector se congela antes de citarlo: copia por `raw/inbox/` o enlace en `raw/LINKS.md`.
 10. Fecha real siempre con `TZ=America/Bogota date`; nunca suponerla.
 
 ## Permisos y nube
 
 - `.claude/settings.json` niega `Edit` (que cubre también `Write`) en `raw/mision`, `revisiones`, `datasheets`, `pruebas`, `vuelos`, `reuniones`, `lecturas` y `datos`. `raw/inbox/` y `raw/LINKS.md` quedan libres.
 - Ingesta: `git mv raw/inbox/<archivo> raw/<subcarpeta>/<id>-<nombre>`, sin opciones y como comando aparte (el `git add` va en otro). La regla `allow` `Bash(git mv raw/inbox/* raw/*)` lo aprueba sin preguntar. Cualquier otro cambio dentro de `raw/` se pide al usuario y nunca se rodea con otro comando o script.
-- Los conectores tienen negadas sus herramientas de escritura (crear, actualizar, borrar, mover o compartir en Drive y Notion).
+- Drive tiene negadas sus herramientas de escritura. En Notion solo se permite crear y editar páginas y subir archivos; siguen negados borrar, mover y duplicar, y tocar bases de datos, vistas o comentarios. La red del entorno bloquea `api.notion.com`, así que las imágenes no se pueden subir a Notion desde la nube.
 - Hook `SessionStart` (`.claude/hooks/session-start.sh`): en la nube instala `sim/requirements.txt` (numpy, scipy, pandas, matplotlib, control).
 
 ## Skills (`.claude/skills/`)
