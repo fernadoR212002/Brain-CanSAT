@@ -3,7 +3,7 @@
 Second brain del equipo para la competencia académica CanSat, con el patrón LLM Wiki: fuentes inmutables (`raw/`), una wiki que escribe Claude y este archivo de reglas. Líder del frente de control y dueño del brain: Angel Fernando Revelo Narvaez. Cubre la misión completa a nivel de resumen y el control a fondo. Cómo lo usan las personas: [GUIA.md](GUIA.md).
 
 > [!WARNING]
-> **Pendiente** — competencia y edición, integrantes y frentes, alcance de control, fechas de revisiones y lanzamiento, y si el repo es solo del líder de control o de todo el equipo. Ver [estado.md](estado.md).
+> **Pendiente** — integrantes y frentes, alcance completo de control, si el repo es solo del líder de control o de todo el equipo, y qué fechas valen (la guía se contradice). Ver [estado.md](estado.md).
 
 ## Capas
 

@@ -6,4 +6,4 @@ Planes, análisis y veredictos de pruebas (TST-NNN). Un vuelo también es una pr
 
 ## Notas
 
-_(sin notas todavía)_
+- [tst-001-exploracion-sensores-celular.md](tst-001-exploracion-sensores-celular.md) — TST-001: exploración del giróscopo y el magnetómetro con un celular (phyphox); prueba exploratoria, sin requisito.

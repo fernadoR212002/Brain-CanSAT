@@ -7,4 +7,4 @@ Teoría de apoyo (principios físicos, métodos de control y estimación, defini
 
 ## Notas
 
-_(sin notas todavía)_
+- [sensores-giroscopio-magnetometro.md](sensores-giroscopio-magnetometro.md) — Qué miden el giróscopo y el magnetómetro, qué cambia entre Bogotá, Medellín y Virginia, sus leyes físicas y lo que pide la guía.

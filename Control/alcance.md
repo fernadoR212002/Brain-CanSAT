@@ -19,20 +19,20 @@ requisitos: []
 
 - **D1.** El brain cubre la misión completa a nivel de resumen y el frente de control a fondo.
 - **D2.** El frente de control lo lidera Angel Fernando Revelo Narvaez.
+- **D8.** La competencia es la CanSat Competition 2027 en formato PocketQube (guía «Rev 1.1»; ver la [ficha de la guía](../Mision/guia-mision-2027.md)).
+- **D9.** Fechas según el calendario oficial (p. 56): PDR el 28-ene-2027, CDR el 1-abr-2027 y lanzamiento el 12-jun-2027. La tabla 1 (p. 37) trae otras fechas; se planea con la más temprana.
+- **D10.** El líder de control definió como primer frente la estabilización de video (C8, C11, PQ15–PQ18), que considera el reto de control más exigente de la misión (sesión del 2026-10-24). Lo aprendido hasta ahora está en [sensores-giroscopio-magnetometro.md](../Conceptos/sensores-giroscopio-magnetometro.md).
 
 ## Pendientes
-
-> [!WARNING]
-> **Pendiente** — Nombre y edición de la competencia.
 
 > [!WARNING]
 > **Pendiente** — Integrantes del equipo y frente de cada uno.
 
 > [!WARNING]
-> **Pendiente** — Qué abarca «control» en nuestra misión (fases, magnitudes que se controlan, sensores y actuadores).
+> **Pendiente** — Qué más abarca «control» en nuestra misión, además de la estabilización de video (fases, magnitudes que se controlan, sensores y actuadores).
 
 > [!WARNING]
-> **Pendiente** — Fechas de las revisiones (PDR, CDR, PFR u otras que fije la guía) y del lanzamiento.
+> **Pendiente** — Confirmar con la organización qué fechas valen, porque la guía se contradice.
 
 > [!WARNING]
 > **Pendiente** — Si el repositorio es solo del líder de control o de todo el equipo.

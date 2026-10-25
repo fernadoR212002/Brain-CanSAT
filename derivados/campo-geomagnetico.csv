@@ -1,0 +1,4 @@
+sitio,fecha,latitud_deg,longitud_deg,altitud_km,total_uT,horizontal_uT,vertical_uT,inclinacion_deg,declinacion_deg,tan_inclinacion,error_rumbo_por_1deg_de_inclinacion_deg,perturbacion_para_1deg_de_rumbo_mG
+Bogotá,2026-10-25,4.711,-74.072,2.6,29.9,26.8,13.3,26.5,-8.8,0.5,0.5,4.7
+Medellín,2026-10-25,6.244,-75.581,1.5,30.8,26.9,15.1,29.3,-8.0,0.56,0.56,4.7
+"Monterey, Virginia",2027-06-12,38.4126,-79.5806,0.9,50.2,21.4,45.4,64.7,-9.2,2.12,2.12,3.7
