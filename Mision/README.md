@@ -7,4 +7,4 @@ La misión completa a nivel de resumen: guía y reglas de la competencia, calend
 
 ## Notas
 
-_(sin notas todavía: la primera llega con la guía de misión)_
+- [guia-mision-2027.md](guia-mision-2027.md) — Ficha de la guía oficial 2027 (PocketQube, Rev 1.1): qué se leyó, datos clave del lazo de rumbo y fechas contradictorias.

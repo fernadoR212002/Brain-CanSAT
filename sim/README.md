@@ -9,4 +9,4 @@ Scripts de Python reproducibles: modelos de planta, simulaciones de control y an
 
 ## Scripts
 
-_(sin scripts todavía)_
+- [campo-geomagnetico.py](campo-geomagnetico.py) — Campo magnético de la Tierra (WMM2025) en Bogotá, Medellín y Monterey (Virginia): intensidad, inclinación, declinación y sensibilidad del rumbo. Escribe `derivados/campo-geomagnetico.csv`.
