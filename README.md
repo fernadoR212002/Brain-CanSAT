@@ -16,7 +16,7 @@ _Actualizado: 2026-10-25 (America/Bogota)._
 | Días restantes | 95 |
 | Requisitos de control verificados | 0 de 0 (los RQ aún no están cargados) |
 | Riesgos altos abiertos | 0 |
-| Próximo paso | habilitar la escritura en Notion y seguir con el acelerómetro |
+| Próximo paso | seguir con el acelerómetro y la fusión de sensores |
 
 > [!WARNING]
 > **Pendiente**

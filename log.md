@@ -44,3 +44,10 @@ Diario del brain. **Solo crece:** cada entrada se agrega al final con el encabez
 
 - El líder aprobó permitir crear y editar páginas dentro de CANSAT en Notion, sin borrar ni mover nada.
 - El clasificador del modo automático bloqueó que Claude editara `.claude/settings.json` (automodificación de permisos). El cambio queda en manos del líder; la regla 9 se ajusta cuando se aplique.
+
+## 2026-10-25 · ajuste · Escritura en Notion habilitada y subpágina de sensores
+
+- Por pedido del líder, `.claude/settings.json` ahora permite crear y editar páginas de Notion y subir archivos (`notion-create-pages`, `notion-update-page`, `notion-create-file-upload`). Siguen negados borrar, mover y duplicar, las bases de datos, las vistas y los comentarios.
+- Regla 9 y «Permisos y nube» actualizadas en `CLAUDE.md`: se escribe solo dentro de CANSAT y la fuente de verdad es el brain.
+- Subpágina creada bajo CANSAT: «Sensores de rumbo: giróscopo y magnetómetro» (https://app.notion.com/p/404d9b500e34818c9d42dfebb09d3367). Tiene las tres partes de `Conceptos/sensores-giroscopio-magnetometro.md` y enlaces al brain.
+- Las 4 capturas de TST-001 no se pudieron subir: la red del entorno bloquea `api.notion.com` (respuesta 403 del proxy). La página tiene un aviso por captura, con su enlace a GitHub, para arrastrarlas a mano.
