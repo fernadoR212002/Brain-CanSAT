@@ -1,0 +1,77 @@
+sitio,magnitud,valor,unidad,fuente
+todos,resolucion_giroscopio_BNO055,0.0625,°/s,"L-10, no validado"
+todos,cumple_PQ28_0.1_deg_s,sí,,comparación con PQ28 (p. 15)
+todos,resolucion_magnetometro_LIS3MDL,0.146,mG,"raw/datos/notion-hardware-2026-10-25.md (0.146 mG/LSB en ±4 G); 6842 LSB/G en L-12, no validado"
+todos,cumple_PQ30_1_mG_LIS3MDL,sí,,comparación con PQ30 (p. 15)
+todos,resolucion_magnetometro_BNO055,3.0,mG,"L-11, no validado"
+todos,cumple_PQ30_1_mG_BNO055,no,,comparación con PQ30 (p. 15)
+todos,ruido_cuantizacion_giroscopio,0.018,°/s rms,q/√12 con la resolución de L-10
+todos,tiempo_hasta_10deg_con_sesgo_1.0_deg_s,10.0,s,"L-15: desfase típico del BMI088, no validado"
+todos,deriva_por_sesgo_1.0_deg_s_en_30_s,30.0,°,"L-15: desfase típico del BMI088, no validado"
+todos,deriva_por_sesgo_1.0_deg_s_en_60_s,60.0,°,"L-15: desfase típico del BMI088, no validado"
+todos,deriva_por_sesgo_1.0_deg_s_en_120_s,120.0,°,"L-15: desfase típico del BMI088, no validado"
+todos,deriva_por_sesgo_1.0_deg_s_en_180_s,180.0,°,"L-15: desfase típico del BMI088, no validado"
+todos,tiempo_hasta_10deg_con_sesgo_0.1_deg_s,100.0,s,supuesto: sesgo residual tras calibrar
+todos,deriva_por_sesgo_0.1_deg_s_en_30_s,3.0,°,supuesto: sesgo residual tras calibrar
+todos,deriva_por_sesgo_0.1_deg_s_en_60_s,6.0,°,supuesto: sesgo residual tras calibrar
+todos,deriva_por_sesgo_0.1_deg_s_en_120_s,12.0,°,supuesto: sesgo residual tras calibrar
+todos,deriva_por_sesgo_0.1_deg_s_en_180_s,18.0,°,supuesto: sesgo residual tras calibrar
+todos,tiempo_hasta_10deg_con_sesgo_0.01_deg_s,1000.0,s,supuesto: sesgo residual tras calibrar bien
+todos,deriva_por_sesgo_0.01_deg_s_en_30_s,0.3,°,supuesto: sesgo residual tras calibrar bien
+todos,deriva_por_sesgo_0.01_deg_s_en_60_s,0.6,°,supuesto: sesgo residual tras calibrar bien
+todos,deriva_por_sesgo_0.01_deg_s_en_120_s,1.2,°,supuesto: sesgo residual tras calibrar bien
+todos,deriva_por_sesgo_0.01_deg_s_en_180_s,1.8,°,supuesto: sesgo residual tras calibrar bien
+todos,caminata_aleatoria_en_30_s,0.077,° (1 sigma),"L-14: valor del BMI055, no del BNO055; no validado; sigma = N·√t, con un factor √2 según la convención de densidad"
+todos,caminata_aleatoria_en_60_s,0.108,° (1 sigma),"L-14: valor del BMI055, no del BNO055; no validado; sigma = N·√t, con un factor √2 según la convención de densidad"
+todos,caminata_aleatoria_en_120_s,0.153,° (1 sigma),"L-14: valor del BMI055, no del BNO055; no validado; sigma = N·√t, con un factor √2 según la convención de densidad"
+todos,caminata_aleatoria_en_180_s,0.188,° (1 sigma),"L-14: valor del BMI055, no del BNO055; no validado; sigma = N·√t, con un factor √2 según la convención de densidad"
+todos,error_por_factor_de_escala_1pct_en_giro_de_90deg,0.9,°,s_g · delta_psi con s_g = 1 % (supuesto) y el giro de 90° de C11
+todos,reduccion_interferencia_dipolo_brazo,394.0,veces,(220/30)^3; 220 mm de PQ10 y 30 mm supuesto
+Bogotá,campo_total_esperado_tras_calibrar,299.0,mG,"WMM2025 (L-01, L-02)"
+Bogotá,campo_horizontal,268.0,mG,"WMM2025 (L-01, L-02)"
+Bogotá,ruido_rumbo_LIS3MDL_por_muestra,0.685,° rms,"sigma_psi = sigma_B / H con L-13, no validado"
+Bogotá,cuantizacion_rumbo_LIS3MDL,0.009,° rms,q / (√12 H)
+Bogotá,cuantizacion_rumbo_telemetria_1_mG,0.0618,° rms,q / (√12 H) con la resolución de PQ30
+Bogotá,cuantizacion_rumbo_BNO055,0.1853,° rms,"q / (√12 H) con L-11, no validado"
+Bogotá,perturbacion_transversal_para_1deg,4.7,mG,"delta_h = H tan(delta_psi), perturbación perpendicular a H"
+Bogotá,perturbacion_transversal_para_5deg,23.4,mG,"delta_h = H tan(delta_psi), perturbación perpendicular a H"
+Bogotá,perturbacion_transversal_para_10deg,47.2,mG,"delta_h = H tan(delta_psi), perturbación perpendicular a H"
+Bogotá,error_rumbo_por_inclinacion_1deg,0.5,°,"atan(tan I · sin delta), peor caso: inclinación sobre el eje del campo horizontal"
+Bogotá,error_rumbo_por_inclinacion_2deg,1.0,°,"atan(tan I · sin delta), peor caso: inclinación sobre el eje del campo horizontal"
+Bogotá,error_rumbo_por_inclinacion_5deg,2.48,°,"atan(tan I · sin delta), peor caso: inclinación sobre el eje del campo horizontal"
+Bogotá,error_rumbo_por_inclinacion_10deg,4.94,°,"atan(tan I · sin delta), peor caso: inclinación sobre el eje del campo horizontal"
+Bogotá,inclinacion_sin_compensar_que_agota_10deg,20.75,°,delta = asin(tan 10° / tan I)
+Bogotá,rotacion_tierra_sobre_la_vertical,0.00034,°/s,Omega_T · sin(latitud)
+Bogotá,deriva_por_rotacion_tierra_en_180_s,0.062,°,Omega_T · sin(latitud) · 180 s
+Medellín,campo_total_esperado_tras_calibrar,308.0,mG,"WMM2025 (L-01, L-02)"
+Medellín,campo_horizontal,269.0,mG,"WMM2025 (L-01, L-02)"
+Medellín,ruido_rumbo_LIS3MDL_por_muestra,0.682,° rms,"sigma_psi = sigma_B / H con L-13, no validado"
+Medellín,cuantizacion_rumbo_LIS3MDL,0.009,° rms,q / (√12 H)
+Medellín,cuantizacion_rumbo_telemetria_1_mG,0.0615,° rms,q / (√12 H) con la resolución de PQ30
+Medellín,cuantizacion_rumbo_BNO055,0.1846,° rms,"q / (√12 H) con L-11, no validado"
+Medellín,perturbacion_transversal_para_1deg,4.7,mG,"delta_h = H tan(delta_psi), perturbación perpendicular a H"
+Medellín,perturbacion_transversal_para_5deg,23.5,mG,"delta_h = H tan(delta_psi), perturbación perpendicular a H"
+Medellín,perturbacion_transversal_para_10deg,47.4,mG,"delta_h = H tan(delta_psi), perturbación perpendicular a H"
+Medellín,error_rumbo_por_inclinacion_1deg,0.56,°,"atan(tan I · sin delta), peor caso: inclinación sobre el eje del campo horizontal"
+Medellín,error_rumbo_por_inclinacion_2deg,1.12,°,"atan(tan I · sin delta), peor caso: inclinación sobre el eje del campo horizontal"
+Medellín,error_rumbo_por_inclinacion_5deg,2.8,°,"atan(tan I · sin delta), peor caso: inclinación sobre el eje del campo horizontal"
+Medellín,error_rumbo_por_inclinacion_10deg,5.56,°,"atan(tan I · sin delta), peor caso: inclinación sobre el eje del campo horizontal"
+Medellín,inclinacion_sin_compensar_que_agota_10deg,18.32,°,delta = asin(tan 10° / tan I)
+Medellín,rotacion_tierra_sobre_la_vertical,0.00045,°/s,Omega_T · sin(latitud)
+Medellín,deriva_por_rotacion_tierra_en_180_s,0.082,°,Omega_T · sin(latitud) · 180 s
+"Monterey, Virginia",campo_total_esperado_tras_calibrar,502.0,mG,"WMM2025 (L-01, L-02)"
+"Monterey, Virginia",campo_horizontal,214.0,mG,"WMM2025 (L-01, L-02)"
+"Monterey, Virginia",ruido_rumbo_LIS3MDL_por_muestra,0.856,° rms,"sigma_psi = sigma_B / H con L-13, no validado"
+"Monterey, Virginia",cuantizacion_rumbo_LIS3MDL,0.0113,° rms,q / (√12 H)
+"Monterey, Virginia",cuantizacion_rumbo_telemetria_1_mG,0.0772,° rms,q / (√12 H) con la resolución de PQ30
+"Monterey, Virginia",cuantizacion_rumbo_BNO055,0.2316,° rms,"q / (√12 H) con L-11, no validado"
+"Monterey, Virginia",perturbacion_transversal_para_1deg,3.7,mG,"delta_h = H tan(delta_psi), perturbación perpendicular a H"
+"Monterey, Virginia",perturbacion_transversal_para_5deg,18.7,mG,"delta_h = H tan(delta_psi), perturbación perpendicular a H"
+"Monterey, Virginia",perturbacion_transversal_para_10deg,37.8,mG,"delta_h = H tan(delta_psi), perturbación perpendicular a H"
+"Monterey, Virginia",error_rumbo_por_inclinacion_1deg,2.12,°,"atan(tan I · sin delta), peor caso: inclinación sobre el eje del campo horizontal"
+"Monterey, Virginia",error_rumbo_por_inclinacion_2deg,4.23,°,"atan(tan I · sin delta), peor caso: inclinación sobre el eje del campo horizontal"
+"Monterey, Virginia",error_rumbo_por_inclinacion_5deg,10.46,°,"atan(tan I · sin delta), peor caso: inclinación sobre el eje del campo horizontal"
+"Monterey, Virginia",error_rumbo_por_inclinacion_10deg,20.19,°,"atan(tan I · sin delta), peor caso: inclinación sobre el eje del campo horizontal"
+"Monterey, Virginia",inclinacion_sin_compensar_que_agota_10deg,4.78,°,delta = asin(tan 10° / tan I)
+"Monterey, Virginia",rotacion_tierra_sobre_la_vertical,0.0026,°/s,Omega_T · sin(latitud)
+"Monterey, Virginia",deriva_por_rotacion_tierra_en_180_s,0.467,°,Omega_T · sin(latitud) · 180 s

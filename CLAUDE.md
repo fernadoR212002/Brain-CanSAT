@@ -78,7 +78,7 @@ Cadena: RQ → RC → DEC → TST → evidencia en `raw/` → REV.
 - `.claude/settings.json` niega `Edit` (que cubre también `Write`) en `raw/mision`, `revisiones`, `datasheets`, `pruebas`, `vuelos`, `reuniones`, `lecturas` y `datos`. `raw/inbox/` y `raw/LINKS.md` quedan libres.
 - Ingesta: `git mv raw/inbox/<archivo> raw/<subcarpeta>/<id>-<nombre>`, sin opciones y como comando aparte (el `git add` va en otro). La regla `allow` `Bash(git mv raw/inbox/* raw/*)` lo aprueba sin preguntar. Cualquier otro cambio dentro de `raw/` se pide al usuario y nunca se rodea con otro comando o script.
 - Drive tiene negadas sus herramientas de escritura. En Notion solo se permite crear y editar páginas y subir archivos; siguen negados borrar, mover y duplicar, y tocar bases de datos, vistas o comentarios. La red del entorno bloquea `api.notion.com`, así que las imágenes no se pueden subir a Notion desde la nube.
-- Hook `SessionStart` (`.claude/hooks/session-start.sh`): en la nube instala `sim/requirements.txt` (numpy, scipy, pandas, matplotlib, control).
+- Hook `SessionStart` (`.claude/hooks/session-start.sh`): en la nube instala `sim/requirements.txt` (numpy, scipy, pandas, matplotlib, control, pygeomag, sympy).
 
 ## Skills (`.claude/skills/`)
 
