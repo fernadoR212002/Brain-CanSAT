@@ -16,7 +16,7 @@ _Actualizado: 2026-10-25 (America/Bogota)._
 | Días restantes | 95 |
 | Requisitos de control verificados | 0 de 0 (los RQ aún no están cargados) |
 | Riesgos altos abiertos | 0 |
-| Próximo paso | seguir con el acelerómetro y la fusión de sensores |
+| Próximo paso | subir las hojas de datos, decidir el actuador de la cámara e identificar el servo |
 
 > [!WARNING]
 > **Pendiente**
@@ -24,6 +24,7 @@ _Actualizado: 2026-10-25 (America/Bogota)._
 > 2. Alcance completo de «control» (el primer frente es la estabilización de video).
 > 3. Si el repositorio es solo del líder de control o de todo el equipo.
 > 4. Confirmar con la organización qué fechas valen, el sitio de lanzamiento y si el norte es el verdadero o el magnético.
+> 5. Las hojas de datos oficiales del BNO055 y del LIS3MDL, y la decisión del actuador de la cámara.
 <!-- estado:fin -->
 
 ## Hitos

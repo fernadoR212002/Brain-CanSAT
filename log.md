@@ -51,3 +51,28 @@ Diario del brain. **Solo crece:** cada entrada se agrega al final con el encabez
 - Regla 9 y «Permisos y nube» actualizadas en `CLAUDE.md`: se escribe solo dentro de CANSAT y la fuente de verdad es el brain.
 - Subpágina creada bajo CANSAT: «Sensores de rumbo: giróscopo y magnetómetro» (https://app.notion.com/p/404d9b500e34818c9d42dfebb09d3367). Tiene las tres partes de `Conceptos/sensores-giroscopio-magnetometro.md` y enlaces al brain.
 - Las 4 capturas de TST-001 no se pudieron subir: la red del entorno bloquea `api.notion.com` (respuesta 403 del proxy). La página tiene un aviso por captura, con su enlace a GitHub, para arrastrarlas a mano.
+
+## 2026-10-25 · control · Avance: caracterización de los sensores, modelo de rumbo en espacio de estados y ejemplo L-07
+
+- Pedido del líder: llevar a la subpágina de Notion «Sensores de rumbo» la caracterización de los sensores, el modelo del sistema en espacio de estados (matrices A, B, C y D) y el ejemplo del seguidor de referencia del brain de Control Adaptativo, con el rigor de un avance.
+- La rama `claude/fervent-gauss-1zksw8` se reinició desde `main`, porque el PR #3 ya estaba fusionado.
+- [sensores-giroscopio-magnetometro](Conceptos/sensores-giroscopio-magnetometro.md) tiene una parte 4 nueva, la caracterización:
+  - la cadena de medición;
+  - la ley física con su sensibilidad, para el giróscopo MEMS y para el magnetómetro;
+  - los modelos de medición;
+  - el error de rumbo que deja cada fuente, sitio por sitio.
+  Los números salen de `sim/caracterizacion-sensores.py`.
+- [modelo-rumbo-espacio-estados](Control/modelo-rumbo-espacio-estados.md) es una nota nueva:
+  - contiene las hipótesis, las ecuaciones físicas y las matrices del cuerpo, de la cámara sobre el servomotor, del modelo reducido, del modelo completo de 6 estados y del estimador;
+  - analiza la controlabilidad, la observabilidad, la discretización con ZOH, el cero de muestreo y el error ante un giro constante del cuerpo;
+  - todo está comprobado con sympy en `sim/modelo-rumbo.py`, para lo que se agregó `sympy` a `sim/requirements.txt`.
+- [L-07](Conceptos/l-07-servomotor-self-tuning.md) es otra nota nueva: el ejemplo del servomotor (RLS + RST) contrastado con el PDF original y reproducido con `sim/l-07-servomotor-self-tuning.py`. Hallazgos:
+  1. La fuente tiene dos erratas: la ec. (19) repite la (17), y el primer intervalo dice «0<t<100».
+  2. Con las ecuaciones tal como están impresas, sin factor de olvido, el estimador no se readapta; con λ = 0,99, la reproducción coincide con la tabla 1.
+  3. Cancelar el cero de muestreo (−0,967, y −0,993 desde t = 20 s) hace zumbar el voltaje; conservarlo elimina el zumbido.
+- `raw/LINKS.md` tiene nuevos enlaces:
+  - L-07, el PDF del curso, por enlace con commit y SHA-256: es material de terceros y no se copió (regla 7);
+  - L-08 y L-09, las hojas de datos oficiales, que no se pudieron abrir;
+  - L-10 a L-15, valores de foros y fichas, no validados.
+- La red del entorno bloquea `bosch-sensortec.com`, `st.com`, `cdn-shop.adafruit.com` y los espejos que se probaron. **Pendiente:** subir las dos hojas de datos por `raw/inbox/`.
+- Notion: a la página se le agregaron el resumen del avance, un índice, las partes 4 a 6, el siguiente paso y los enlaces; las partes 1 a 3 quedaron iguales. Las 2 figuras nuevas quedan como avisos para arrastrarlas a mano, porque la red bloquea `api.notion.com`.
