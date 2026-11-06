@@ -1,6 +1,6 @@
 # Estado del CanSat Brain
 
-_Actualizado: 2026-10-25 (America/Bogota). Lo reescribe la skill `estado`; una página como máximo._
+_Actualizado: 2026-11-05 (America/Bogota). Lo reescribe la skill `estado`; una página como máximo._
 
 **Próximo paso:** subir las hojas de datos del BNO055 y del LIS3MDL, decidir el actuador de la cámara e identificar el servo.
 
@@ -20,6 +20,8 @@ Avance de control listo, en el brain y en Notion ([Sensores de rumbo](https://ap
 - la caracterización de los sensores ([nota](Conceptos/sensores-giroscopio-magnetometro.md), parte 4);
 - el modelo en espacio de estados ([nota](Control/modelo-rumbo-espacio-estados.md));
 - el ejemplo del seguidor de referencia ([L-07](Conceptos/l-07-servomotor-self-tuning.md)).
+
+Código de prueba del servo en MATLAB: [servo-prueba-futaba.m](sim/servo-prueba-futaba.m).
 
 ## Pendientes
 

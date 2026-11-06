@@ -76,3 +76,11 @@ Diario del brain. **Solo crece:** cada entrada se agrega al final con el encabez
   - L-10 a L-15, valores de foros y fichas, no validados.
 - La red del entorno bloquea `bosch-sensortec.com`, `st.com`, `cdn-shop.adafruit.com` y los espejos que se probaron. **Pendiente:** subir las dos hojas de datos por `raw/inbox/`.
 - Notion: a la página se le agregaron el resumen del avance, un índice, las partes 4 a 6, el siguiente paso y los enlaces; las partes 1 a 3 quedaron iguales. Las 2 figuras nuevas quedan como avisos para arrastrarlas a mano, porque la red bloquea `api.notion.com`.
+
+## 2026-11-05 · codigo · Código de prueba del servomotor (MATLAB)
+
+- Pedido del líder: guardar en el brain su código de prueba del servo.
+- Nuevo [servo-prueba-futaba.m](sim/servo-prueba-futaba.m): empieza con `clear a s`, lleva el servo a 0 y 180 grados y lo deja en `angulo` (90 grados), con pulso de 0,6 a 2,4 ms. Para moverlo sin correr todo: `angulo = 120; writePosition(s, angulo / recorrido)`.
+- Depende de `servo_futaba` (brain de tesis del líder, `code/EXP-005/servo`), que no está en este repo.
+- **Pendiente:** confirmar el rango de pulso con la hoja de datos del servo; todavía no hay TST ni datos medidos.
+
