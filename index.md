@@ -49,7 +49,7 @@ Enlaces externos ([raw/LINKS.md](raw/LINKS.md)): L-01 modelo WMM2025 (NOAA) · L
 
 ## Simulación y herramientas
 
-- [sim/requirements.txt](sim/requirements.txt): entorno de simulación. Scripts de `sim/`: [campo-geomagnetico.py](sim/campo-geomagnetico.py) · [caracterizacion-sensores.py](sim/caracterizacion-sensores.py) · [modelo-rumbo.py](sim/modelo-rumbo.py) · [l-07-servomotor-self-tuning.py](sim/l-07-servomotor-self-tuning.py).
+- [sim/requirements.txt](sim/requirements.txt): entorno de simulación. Scripts de `sim/`: [campo-geomagnetico.py](sim/campo-geomagnetico.py) · [caracterizacion-sensores.py](sim/caracterizacion-sensores.py) · [modelo-rumbo.py](sim/modelo-rumbo.py) · [l-07-servomotor-self-tuning.py](sim/l-07-servomotor-self-tuning.py) · [servo-prueba-futaba.m](sim/servo-prueba-futaba.m) (MATLAB, prueba de banco del servo).
 - [scripts/matriz-requisitos.py](scripts/matriz-requisitos.py) · [scripts/lint.py](scripts/lint.py) · [scripts/brain.py](scripts/brain.py).
 
 ## Salidas (`salida/`)
