@@ -84,3 +84,15 @@ Diario del brain. **Solo crece:** cada entrada se agrega al final con el encabez
 - Depende de `servo_futaba` (brain de tesis del líder, `code/EXP-005/servo`), que no está en este repo.
 - **Pendiente:** confirmar el rango de pulso con la hoja de datos del servo; todavía no hay TST ni datos medidos.
 
+
+## 2026-11-08 · control · Opciones de control del lazo de la cámara (L0 a L8)
+
+- Pedido del líder: qué controladores sirven para estabilizar la cámara con el BNO055. La respuesta se archivó también en el brain de Control Adaptativo (su PR #1), y aquí se trae con las reglas de este brain.
+- Nueva nota [diseno-estabilizacion-camara](Control/diseno-estabilizacion-camara.md), con el script [diseno-estabilizacion-camara.py](sim/diseno-estabilizacion-camara.py), tres CSV en `derivados/` y una figura. Resultados:
+  1. Se recomienda L3: RST con integrador que conserva el cero de muestreo, más prealimentación del giróscopo $u_{ff}=-\hat\omega_b/K_c$. Deja un error de control ≤ 0,27° y aguanta sin adaptar los cambios de régimen de L-07.
+  2. El error que queda (≈ 2,5–3,1°) es casi todo del estimador de rumbo.
+  3. En vuelo no se identifica la planta completa, porque los regresores quedan colineales (cond 1,5–1,8·10¹⁰ frente a 5,7·10⁵ en lazo abierto con SBPA). Sí se identifica $K_c$ (error ≤ 1,7 %).
+  4. Cancelar el cero multiplica el RMS de Δu por 21 a 42.
+- Nuevo [RSK-001](Riesgos/rsk-001-rango-servo-camara.md): el servo Futaba de 180° gasta la mitad de su recorrido en el giro de 90° de C11. Nivel medio, pendiente de medir el giro real.
+- Matiz a la caracterización: bajo el paracaídas el acelerómetro no ve el balanceo (P3 de la nota), así que la inclinación para nivelar el magnetómetro debe salir de la fusión con giróscopos. **Pendiente:** verificarlo con un péndulo.
+- **Pendiente:** DEC-001 (los pesos los acuerda el equipo), los RC del lazo de rumbo y los TST de identificación en banco y de caída desde dron.

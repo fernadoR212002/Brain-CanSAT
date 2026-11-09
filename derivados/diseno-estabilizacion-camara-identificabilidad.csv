@@ -1,0 +1,10 @@
+experimento,cond_PhiTPhi,Kc_estimada,tau_estimada_s,corr_u_wb
+a_lazo_abierto_SBPA,5.672e+05,30.001,0.1000,
+b_lazo_cerrado_L2,1.539e+10,13.202,0.0470,-0.934
+b_lazo_cerrado_L3,1.842e+10,9.036,0.0329,-0.936
+c_Kc_escalar_S1_Kc21_tau0.1,,20.998,,
+c_Kc_escalar_S1_Kc30_tau0.1,,30.085,,
+c_Kc_escalar_S1_Kc60_tau0.5,,58.967,,
+c_Kc_escalar_S2_Kc21_tau0.1,,20.995,,
+c_Kc_escalar_S2_Kc30_tau0.1,,29.994,,
+c_Kc_escalar_S2_Kc60_tau0.5,,59.680,,

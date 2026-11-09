@@ -22,11 +22,11 @@ Enlaces externos ([raw/LINKS.md](raw/LINKS.md)): L-01 modelo WMM2025 (NOAA) · L
 | Carpeta | Notas |
 |---|---|
 | [Mision/](Mision/README.md) | [guia-mision-2027.md](Mision/guia-mision-2027.md): ficha de la guía oficial (procesada en parte) |
-| [Control/](Control/README.md) | [alcance.md](Control/alcance.md): alcance del frente de control (con pendientes) · [modelo-rumbo-espacio-estados.md](Control/modelo-rumbo-espacio-estados.md): modelo del lazo de rumbo con sus matrices A, B, C, D |
+| [Control/](Control/README.md) | [alcance.md](Control/alcance.md): alcance del frente de control (con pendientes) · [diseno-estabilizacion-camara.md](Control/diseno-estabilizacion-camara.md): opciones de control del lazo de la cámara (L0 a L8), simulación y identificabilidad · [modelo-rumbo-espacio-estados.md](Control/modelo-rumbo-espacio-estados.md): modelo del lazo de rumbo con sus matrices A, B, C, D |
 | [Subsistemas/](Subsistemas/README.md) | _(sin notas)_ |
 | [Decisiones/](Decisiones/README.md) | _(sin notas)_ |
 | [Pruebas/](Pruebas/README.md) | [tst-001-exploracion-sensores-celular.md](Pruebas/tst-001-exploracion-sensores-celular.md): TST-001, giróscopo y magnetómetro con un celular |
-| [Riesgos/](Riesgos/README.md) | _(sin notas)_ |
+| [Riesgos/](Riesgos/README.md) | [rsk-001-rango-servo-camara.md](Riesgos/rsk-001-rango-servo-camara.md): RSK-001, recorrido del servo de la cámara |
 | [Conceptos/](Conceptos/README.md) | [sensores-giroscopio-magnetometro.md](Conceptos/sensores-giroscopio-magnetometro.md): qué miden, Bogotá–Medellín–Virginia, leyes físicas, requisitos y caracterización · [l-07-servomotor-self-tuning.md](Conceptos/l-07-servomotor-self-tuning.md): L-07, seguidor de un modelo de referencia (RLS + RST) |
 | [Entregas/](Entregas/README.md) | _(sin notas)_ |
 | [Plantillas/](Plantillas/README.md) | [requisito](Plantillas/requisito.md) · [decision](Plantillas/decision.md) · [prueba](Plantillas/prueba.md) · [riesgo](Plantillas/riesgo.md) · [interfaz](Plantillas/interfaz.md) · [acta](Plantillas/acta.md) · [entrega](Plantillas/entrega.md) |
@@ -37,7 +37,7 @@ Enlaces externos ([raw/LINKS.md](raw/LINKS.md)): L-01 modelo WMM2025 (NOAA) · L
 
 | RQ | RC | DEC | TST | RSK | ICD | DS | L | ACT | REV |
 |---|---|---|---|---|---|---|---|---|---|
-| — | — | — | TST-001 | — | — | — | L-15 | — | — |
+| — | — | — | TST-001 | RSK-001 | — | — | L-15 | — | — |
 
 ## Derivados (`derivados/`)
 
@@ -45,16 +45,18 @@ Enlaces externos ([raw/LINKS.md](raw/LINKS.md)): L-01 modelo WMM2025 (NOAA) · L
 - [campo-geomagnetico.csv](derivados/campo-geomagnetico.csv): campo WMM2025 en Bogotá, Medellín y Monterey (lo escribe `sim/campo-geomagnetico.py`).
 - [caracterizacion-sensores.csv](derivados/caracterizacion-sensores.csv): error de rumbo por fuente y por sitio (`sim/caracterizacion-sensores.py`).
 - [modelo-rumbo.txt](derivados/modelo-rumbo.txt), [modelo-rumbo-cero-de-muestreo.csv](derivados/modelo-rumbo-cero-de-muestreo.csv) y [modelo-rumbo-giro-maximo.csv](derivados/modelo-rumbo-giro-maximo.csv): comprobación simbólica del modelo de rumbo (`sim/modelo-rumbo.py`).
+- [diseno-estabilizacion-camara-metricas.csv](derivados/diseno-estabilizacion-camara-metricas.csv), [-robustez.csv](derivados/diseno-estabilizacion-camara-robustez.csv) y [-identificabilidad.csv](derivados/diseno-estabilizacion-camara-identificabilidad.csv): comparación de leyes de control de la cámara (`sim/diseno-estabilizacion-camara.py`).
 - [l-07-modelos-discretos.csv](derivados/l-07-modelos-discretos.csv), [l-07-reproduccion-str.csv](derivados/l-07-reproduccion-str.csv) y [l-07-cero-de-muestreo.csv](derivados/l-07-cero-de-muestreo.csv): reproducción del ejemplo L-07 (`sim/l-07-servomotor-self-tuning.py`).
 
 ## Simulación y herramientas
 
-- [sim/requirements.txt](sim/requirements.txt): entorno de simulación. Scripts de `sim/`: [campo-geomagnetico.py](sim/campo-geomagnetico.py) · [caracterizacion-sensores.py](sim/caracterizacion-sensores.py) · [modelo-rumbo.py](sim/modelo-rumbo.py) · [l-07-servomotor-self-tuning.py](sim/l-07-servomotor-self-tuning.py) · [servo-prueba-futaba.m](sim/servo-prueba-futaba.m) (MATLAB, prueba de banco del servo).
+- [sim/requirements.txt](sim/requirements.txt): entorno de simulación. Scripts de `sim/`: [campo-geomagnetico.py](sim/campo-geomagnetico.py) · [caracterizacion-sensores.py](sim/caracterizacion-sensores.py) · [modelo-rumbo.py](sim/modelo-rumbo.py) · [l-07-servomotor-self-tuning.py](sim/l-07-servomotor-self-tuning.py) · [diseno-estabilizacion-camara.py](sim/diseno-estabilizacion-camara.py) · [servo-prueba-futaba.m](sim/servo-prueba-futaba.m) (MATLAB, prueba de banco del servo).
 - [scripts/matriz-requisitos.py](scripts/matriz-requisitos.py) · [scripts/lint.py](scripts/lint.py) · [scripts/brain.py](scripts/brain.py).
 
 ## Salidas (`salida/`)
 
 - [matriz-requisitos.csv](salida/matriz-requisitos.csv): matriz de trazabilidad (vacía, con encabezados).
+- [figuras/diseno-estabilizacion-camara.png](salida/figuras/diseno-estabilizacion-camara.png): error de la cámara en S2 y zumbido del cero cancelado.
 - [figuras/l-07-reproduccion-str.png](salida/figuras/l-07-reproduccion-str.png) y [figuras/l-07-cero-de-muestreo.png](salida/figuras/l-07-cero-de-muestreo.png): figuras del ejemplo L-07.
 
 ## Memoria, guías y configuración

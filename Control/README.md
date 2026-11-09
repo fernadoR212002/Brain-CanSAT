@@ -9,4 +9,5 @@ El frente de control a fondo: alcance, requisitos derivados de control (RC-NNN, 
 ## Notas
 
 - [alcance.md](alcance.md) — Alcance del frente de control: lo que sabemos, pendientes, preguntas para la guía y métricas de desempeño.
+- [diseno-estabilizacion-camara.md](diseno-estabilizacion-camara.md) — Opciones de control del lazo de la cámara (L0 a L8) simuladas en dos escenarios de giro: se recomienda un RST con integrador que conserva el cero de muestreo, más prealimentación del giróscopo. El cuello de botella es el estimador de rumbo y en vuelo solo es identificable $K_c$.
 - [modelo-rumbo-espacio-estados.md](modelo-rumbo-espacio-estados.md) — Modelo del lazo de rumbo: hipótesis, ecuaciones físicas, matrices A, B, C, D (cuerpo, cámara sobre servomotor, modelo completo con sensores y estimador), controlabilidad, observabilidad, discretización y cero de muestreo.
