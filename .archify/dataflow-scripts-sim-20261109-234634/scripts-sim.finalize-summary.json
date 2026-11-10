@@ -1,0 +1,109 @@
+{
+  "schemaVersion": 1,
+  "ok": true,
+  "command": "finalize",
+  "status": "pass",
+  "type": "dataflow",
+  "quality": "showcase",
+  "specification": {
+    "path": "/home/angelrevelo/Documents/Brain-CanSAT/.archify/dataflow-scripts-sim-20261109-234634/candidate.json",
+    "sha256": "37cc57a21a51ed69a4c4d98e283022d3931ce34b3289a6ff82bcf20a9fb27ec2",
+    "bytes": 11955
+  },
+  "artifact": {
+    "path": "/home/angelrevelo/Documents/Brain-CanSAT/.archify/dataflow-scripts-sim-20261109-234634/scripts-sim.html",
+    "sha256": "19459dfdaab9aff50c5a0c5bd4b81e1cef3384e9b3b9ec5a2fccf095a30c9868",
+    "bytes": 869078
+  },
+  "gates": {
+    "validate": "pass",
+    "deliver": "pass",
+    "check": "pass",
+    "browser-check": "pass"
+  },
+  "diagnostics": [],
+  "diagnosticSummary": {
+    "total": 0,
+    "shown": 0,
+    "truncated": false
+  },
+  "evidence": {
+    "receipt": "/home/angelrevelo/Documents/Brain-CanSAT/.archify/dataflow-scripts-sim-20261109-234634/scripts-sim.finalize.json",
+    "summaryReceipt": "/home/angelrevelo/Documents/Brain-CanSAT/.archify/dataflow-scripts-sim-20261109-234634/scripts-sim.finalize-summary.json",
+    "browserCheckReceipt": "/home/angelrevelo/Documents/Brain-CanSAT/.archify/dataflow-scripts-sim-20261109-234634/scripts-sim.browser-check.json"
+  },
+  "update": {
+    "status": "current",
+    "installedVersion": "3.2.0",
+    "availableVersion": "3.2.0",
+    "releaseNotes": null,
+    "checkedAt": "2026-11-10T04:47:36.560Z",
+    "source": "cache",
+    "noticeRequired": false,
+    "noticeText": null
+  },
+  "visualReview": "not-requested",
+  "durationMs": 9860,
+  "browserCheck": {
+    "requested": true,
+    "ran": true
+  },
+  "visualReviewRecommendation": {
+    "action": "inspect-route-readability",
+    "signals": {
+      "resolvedCrossovers": 2
+    },
+    "reason": "Automated gates passed, but crossings or detours still need perceptual review before claiming visual quality.",
+    "affectedRoutes": {
+      "crossings": [
+        {
+          "left": {
+            "id": "f-w-modelo",
+            "from": "s-modelo",
+            "to": "o-modelo",
+            "label": "rangos, FT, z0",
+            "collectionIndex": 8,
+            "artifactIndex": 9
+          },
+          "right": {
+            "id": "f-sigma",
+            "from": "o-caract",
+            "to": "s-diseno",
+            "label": "ruido 0,9°",
+            "collectionIndex": 11,
+            "artifactIndex": 12
+          },
+          "point": [
+            425.75,
+            385
+          ]
+        },
+        {
+          "left": {
+            "id": "f-w-l07",
+            "from": "s-l07",
+            "to": "o-l07",
+            "label": "reproducción",
+            "collectionIndex": 9,
+            "artifactIndex": 10
+          },
+          "right": {
+            "id": "f-sigma",
+            "from": "o-caract",
+            "to": "s-diseno",
+            "label": "ruido 0,9°",
+            "collectionIndex": 11,
+            "artifactIndex": 12
+          },
+          "point": [
+            425.75,
+            499
+          ]
+        }
+      ],
+      "detours": [],
+      "truncated": false
+    },
+    "repair": "Advisory only: this mode places or routes these relationships itself. Report them; do not remove relationships or meaning to reduce crossings."
+  }
+}

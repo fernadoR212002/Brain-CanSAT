@@ -1,0 +1,17 @@
+{
+  "schemaVersion": 1,
+  "receiptId": "32867f71-49f4-476f-b1da-1ec2fabde5c1",
+  "status": "current",
+  "command": "deliver",
+  "type": "dataflow",
+  "input": "/home/angelrevelo/Documents/Brain-CanSAT/.archify/dataflow-scripts-sim-20261109-234634/candidate.json",
+  "output": "/home/angelrevelo/Documents/Brain-CanSAT/.archify/dataflow-scripts-sim-20261109-234634/scripts-sim.html",
+  "specification": {
+    "sha256": "37cc57a21a51ed69a4c4d98e283022d3931ce34b3289a6ff82bcf20a9fb27ec2",
+    "bytes": 11955
+  },
+  "artifact": {
+    "sha256": "19459dfdaab9aff50c5a0c5bd4b81e1cef3384e9b3b9ec5a2fccf095a30c9868",
+    "bytes": 869078
+  }
+}

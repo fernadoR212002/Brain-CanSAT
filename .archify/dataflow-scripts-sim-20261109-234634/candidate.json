@@ -1,0 +1,525 @@
+{
+  "schema_version": 1,
+  "diagram_type": "dataflow",
+  "meta": {
+    "title": "Qué hace cada script de sim/",
+    "locale": "es",
+    "output": ".archify/dataflow-scripts-sim-20261109-234634/scripts-sim.html",
+    "quality_profile": "showcase",
+    "repository": {
+      "url": "https://github.com/fernadoR212002/Brain-CanSAT.git",
+      "revision": "fcce52feb420333b9ba59e6e876ac8fbd655e163"
+    },
+    "legend": {
+      "entries": {
+        "default": {
+          "label": "lee, escribe o respalda"
+        },
+        "dashed": {
+          "label": "valor copiado a mano al código"
+        },
+        "database": {
+          "label": "archivo que genera el script"
+        }
+      }
+    }
+  },
+  "stages": [
+    {
+      "label": "Fuente de los parámetros"
+    },
+    {
+      "label": "Script en sim/"
+    },
+    {
+      "label": "Archivos que escribe"
+    },
+    {
+      "label": "Nota que respalda"
+    }
+  ],
+  "nodes": [
+    {
+      "id": "wmm",
+      "type": "external",
+      "label": "WMM2025 (NOAA)",
+      "sublabel": "coeficientes vía pygeomag",
+      "tag": "L-01 · L-02",
+      "stage": 0,
+      "row": 0,
+      "sources": [
+        {
+          "path": "sim/campo-geomagnetico.py",
+          "line": 8,
+          "end_line": 8
+        },
+        {
+          "path": "sim/campo-geomagnetico.py",
+          "line": 38,
+          "end_line": 38
+        }
+      ]
+    },
+    {
+      "id": "hojas",
+      "type": "external",
+      "label": "Hojas de datos",
+      "sublabel": "BNO055 y LIS3MDL",
+      "tag": "no validadas",
+      "stage": 0,
+      "row": 1,
+      "sources": [
+        {
+          "path": "sim/caracterizacion-sensores.py",
+          "line": 26,
+          "end_line": 35
+        }
+      ]
+    },
+    {
+      "id": "guia",
+      "type": "external",
+      "label": "Guía de misión 2027",
+      "sublabel": "PQ28, PQ30, C8",
+      "tag": "raw/mision",
+      "stage": 0,
+      "row": 2,
+      "sources": [
+        {
+          "path": "sim/caracterizacion-sensores.py",
+          "line": 20,
+          "end_line": 24
+        }
+      ]
+    },
+    {
+      "id": "lectura-l07",
+      "type": "external",
+      "label": "Lectura L-07",
+      "sublabel": "servomotor self-tuning",
+      "tag": "raw/LINKS.md",
+      "stage": 0,
+      "row": 3,
+      "sources": [
+        {
+          "path": "sim/l-07-servomotor-self-tuning.py",
+          "line": 13,
+          "end_line": 21
+        },
+        {
+          "path": "sim/diseno-estabilizacion-camara.py",
+          "line": 26,
+          "end_line": 26
+        }
+      ]
+    },
+    {
+      "id": "s-campo",
+      "type": "backend",
+      "label": "Campo geomagnético",
+      "sublabel": "campo-geomagnetico.py",
+      "tag": "campo B, I, D",
+      "stage": 1,
+      "row": 0,
+      "sources": [
+        {
+          "path": "sim/campo-geomagnetico.py",
+          "line": 1,
+          "end_line": 11
+        },
+        {
+          "path": "sim/campo-geomagnetico.py",
+          "line": 37,
+          "end_line": 40
+        }
+      ]
+    },
+    {
+      "id": "s-caract",
+      "type": "backend",
+      "label": "Caracterización",
+      "sublabel": "caracterizacion-sensores.py",
+      "tag": "error de rumbo",
+      "stage": 1,
+      "row": 1,
+      "sources": [
+        {
+          "path": "sim/caracterizacion-sensores.py",
+          "line": 1,
+          "end_line": 11
+        },
+        {
+          "path": "sim/caracterizacion-sensores.py",
+          "line": 42,
+          "end_line": 50,
+          "label": "importa campo-geomagnetico"
+        }
+      ]
+    },
+    {
+      "id": "s-modelo",
+      "type": "backend",
+      "label": "Modelo de rumbo",
+      "sublabel": "modelo-rumbo.py",
+      "tag": "sympy, simbólico",
+      "stage": 1,
+      "row": 2,
+      "sources": [
+        {
+          "path": "sim/modelo-rumbo.py",
+          "line": 1,
+          "end_line": 13
+        },
+        {
+          "path": "sim/modelo-rumbo.py",
+          "line": 226,
+          "end_line": 237
+        }
+      ]
+    },
+    {
+      "id": "s-l07",
+      "type": "backend",
+      "label": "Servomotor L-07",
+      "sublabel": "l-07-servomotor-self-tuning.py",
+      "tag": "RLS + RST",
+      "stage": 1,
+      "row": 3,
+      "sources": [
+        {
+          "path": "sim/l-07-servomotor-self-tuning.py",
+          "line": 1,
+          "end_line": 21
+        },
+        {
+          "path": "sim/l-07-servomotor-self-tuning.py",
+          "line": 37,
+          "end_line": 46
+        }
+      ]
+    },
+    {
+      "id": "s-diseno",
+      "type": "backend",
+      "label": "Estabilización",
+      "sublabel": "diseno-estabilizacion-camara.py",
+      "tag": "leyes L0 a L5",
+      "stage": 1,
+      "row": 4,
+      "sources": [
+        {
+          "path": "sim/diseno-estabilizacion-camara.py",
+          "line": 1,
+          "end_line": 15
+        },
+        {
+          "path": "sim/diseno-estabilizacion-camara.py",
+          "line": 145,
+          "end_line": 160
+        }
+      ]
+    },
+    {
+      "id": "o-campo",
+      "type": "database",
+      "label": "CSV del campo",
+      "sublabel": "campo-geomagnetico.csv",
+      "stage": 2,
+      "row": 0,
+      "sources": [
+        {
+          "path": "sim/campo-geomagnetico.py",
+          "line": 20,
+          "end_line": 20
+        },
+        {
+          "path": "sim/campo-geomagnetico.py",
+          "line": 63,
+          "end_line": 63
+        }
+      ]
+    },
+    {
+      "id": "o-caract",
+      "type": "database",
+      "label": "CSV de sensores",
+      "sublabel": "caracterizacion-sensores.csv",
+      "stage": 2,
+      "row": 1,
+      "sources": [
+        {
+          "path": "sim/caracterizacion-sensores.py",
+          "line": 18,
+          "end_line": 18
+        },
+        {
+          "path": "sim/caracterizacion-sensores.py",
+          "line": 120,
+          "end_line": 120
+        }
+      ]
+    },
+    {
+      "id": "o-modelo",
+      "type": "database",
+      "label": "TXT + 2 CSV",
+      "sublabel": "derivados/modelo-rumbo*",
+      "stage": 2,
+      "row": 2,
+      "sources": [
+        {
+          "path": "sim/modelo-rumbo.py",
+          "line": 21,
+          "end_line": 22
+        },
+        {
+          "path": "sim/modelo-rumbo.py",
+          "line": 179,
+          "end_line": 179
+        },
+        {
+          "path": "sim/modelo-rumbo.py",
+          "line": 214,
+          "end_line": 215
+        }
+      ]
+    },
+    {
+      "id": "o-l07",
+      "type": "database",
+      "label": "3 CSV + 2 figuras",
+      "sublabel": "derivados/l-07-* · salida/figuras/",
+      "stage": 2,
+      "row": 3,
+      "sources": [
+        {
+          "path": "sim/l-07-servomotor-self-tuning.py",
+          "line": 7,
+          "end_line": 11
+        },
+        {
+          "path": "sim/l-07-servomotor-self-tuning.py",
+          "line": 291,
+          "end_line": 291
+        },
+        {
+          "path": "sim/l-07-servomotor-self-tuning.py",
+          "line": 313,
+          "end_line": 313
+        }
+      ]
+    },
+    {
+      "id": "o-diseno",
+      "type": "database",
+      "label": "3 CSV + 1 figura",
+      "sublabel": "métricas, robustez, identificabilidad",
+      "stage": 2,
+      "row": 4,
+      "sources": [
+        {
+          "path": "sim/diseno-estabilizacion-camara.py",
+          "line": 330,
+          "end_line": 330
+        },
+        {
+          "path": "sim/diseno-estabilizacion-camara.py",
+          "line": 352,
+          "end_line": 352
+        },
+        {
+          "path": "sim/diseno-estabilizacion-camara.py",
+          "line": 372,
+          "end_line": 372
+        }
+      ]
+    },
+    {
+      "id": "n-sensores",
+      "type": "frontend",
+      "label": "Nota de sensores",
+      "sublabel": "Conceptos/ giróscopo y magnetómetro",
+      "stage": 3,
+      "row": 1,
+      "sources": [
+        {
+          "path": "Conceptos/sensores-giroscopio-magnetometro.md"
+        }
+      ]
+    },
+    {
+      "id": "n-modelo",
+      "type": "frontend",
+      "label": "Modelo de rumbo",
+      "sublabel": "Control/ espacio de estados",
+      "stage": 3,
+      "row": 2,
+      "sources": [
+        {
+          "path": "Control/modelo-rumbo-espacio-estados.md"
+        }
+      ]
+    },
+    {
+      "id": "n-l07",
+      "type": "frontend",
+      "label": "Nota de L-07",
+      "sublabel": "Conceptos/ servomotor self-tuning",
+      "stage": 3,
+      "row": 3,
+      "sources": [
+        {
+          "path": "Conceptos/l-07-servomotor-self-tuning.md"
+        }
+      ]
+    },
+    {
+      "id": "n-diseno",
+      "type": "frontend",
+      "label": "Estabilización",
+      "sublabel": "Control/ diseño de la cámara",
+      "stage": 3,
+      "row": 4,
+      "sources": [
+        {
+          "path": "Control/diseno-estabilizacion-camara.md"
+        }
+      ]
+    }
+  ],
+  "flows": [
+    {
+      "id": "f-wmm",
+      "from": "wmm",
+      "to": "s-campo",
+      "label": "modelo del campo"
+    },
+    {
+      "id": "f-importa",
+      "from": "s-campo",
+      "to": "s-caract",
+      "label": "importa sitios"
+    },
+    {
+      "id": "f-hojas",
+      "from": "hojas",
+      "to": "s-caract",
+      "label": "resolución, ruido"
+    },
+    {
+      "id": "f-guia",
+      "from": "guia",
+      "to": "s-caract",
+      "label": "límites PQ28, C8"
+    },
+    {
+      "id": "f-l07-str",
+      "from": "lectura-l07",
+      "to": "s-l07",
+      "label": "planta y RST"
+    },
+    {
+      "id": "f-l07-planta",
+      "from": "lectura-l07",
+      "to": "s-diseno",
+      "label": "Kc=30, τ=0,1 s"
+    },
+    {
+      "id": "f-w-campo",
+      "from": "s-campo",
+      "to": "o-campo",
+      "label": "campo por sitio"
+    },
+    {
+      "id": "f-w-caract",
+      "from": "s-caract",
+      "to": "o-caract",
+      "label": "error por fuente"
+    },
+    {
+      "id": "f-w-modelo",
+      "from": "s-modelo",
+      "to": "o-modelo",
+      "label": "rangos, FT, z0"
+    },
+    {
+      "id": "f-w-l07",
+      "from": "s-l07",
+      "to": "o-l07",
+      "label": "reproducción"
+    },
+    {
+      "id": "f-w-diseno",
+      "from": "s-diseno",
+      "to": "o-diseno",
+      "label": "métricas L0–L5"
+    },
+    {
+      "id": "f-sigma",
+      "from": "o-caract",
+      "to": "s-diseno",
+      "label": "ruido 0,9°",
+      "variant": "dashed"
+    },
+    {
+      "id": "f-n-campo",
+      "from": "o-campo",
+      "to": "n-sensores",
+      "label": "valores del campo"
+    },
+    {
+      "id": "f-n-caract",
+      "from": "o-caract",
+      "to": "n-sensores",
+      "label": "tablas parte 4"
+    },
+    {
+      "id": "f-n-modelo",
+      "from": "o-modelo",
+      "to": "n-modelo",
+      "label": "respalda"
+    },
+    {
+      "id": "f-n-l07",
+      "from": "o-l07",
+      "to": "n-l07",
+      "label": "respalda"
+    },
+    {
+      "id": "f-n-diseno",
+      "from": "o-diseno",
+      "to": "n-diseno",
+      "label": "respalda"
+    }
+  ],
+  "cards": [
+    {
+      "dot": "cyan",
+      "title": "Orden de lectura",
+      "items": [
+        "1 y 2: qué tan buenos son los sensores (campo de la Tierra y error de rumbo por fuente)",
+        "3: el modelo del lazo de rumbo es correcto para cualquier valor físico",
+        "4: base teórica del control adaptativo (L-07)",
+        "5: compara los controladores del lazo de la cámara"
+      ]
+    },
+    {
+      "dot": "amber",
+      "title": "Qué es medido y qué no",
+      "items": [
+        "Ningún script lee todavía datos de prueba de raw/pruebas ni de raw/vuelos",
+        "Solo campo-geomagnetico lee un archivo externo: los coeficientes WMM que trae pygeomag",
+        "Los demás llevan sus constantes en el código, con la fuente en un comentario; varias están marcadas «no validado»"
+      ]
+    },
+    {
+      "dot": "slate",
+      "title": "Cómo correrlos",
+      "items": [
+        "Desde la raíz del repo, con el .venv activo: python sim/<script>.py",
+        "Las versiones de las librerías están fijadas en sim/requirements.txt",
+        "servo-prueba-futaba.m (MATLAB) mueve el servo real en el banco y no escribe archivos"
+      ]
+    }
+  ]
+}

@@ -1,8 +1,8 @@
 planta,diseno,r0,s1,s0,t1,t0,polo_mas_negativo_de_U_sobre_Yr,u_max_V,fraccion_saturada,rms_du_V,error_max_en_muestras_rad,rms_du_en_reposo_V,oscilacion_theta_en_reposo_mrad
 K_c = 30; tau_c = 0.1 s,A: cancela el cero (fuente),0.9672,53.07,-34.61,10.63,7.83,-0.9672,20.9,0.0,4.87,0.0,1.817,9.264
-K_c = 30; tau_c = 0.1 s,B: conserva el cero,0.3276,30.5,-21.12,9.38,0.0,0.0,18.8,0.0,3.25,0.0,0.0,0.003
+K_c = 30; tau_c = 0.1 s,B: conserva el cero,0.3276,30.5,-21.12,9.38,0.0,-0.0,18.8,0.0,3.25,0.0,0.0,0.003
 K_c = 60; tau_c = 0.1 s,A: cancela el cero (fuente),0.9672,26.54,-17.31,5.32,3.91,-0.9672,10.5,0.0,2.44,0.0,0.908,9.264
-K_c = 60; tau_c = 0.1 s,B: conserva el cero,0.3276,15.25,-10.56,4.69,0.0,0.0,9.4,0.0,1.63,0.0,0.0,0.003
+K_c = 60; tau_c = 0.1 s,B: conserva el cero,0.3276,15.25,-10.56,4.69,0.0,-0.0,9.4,0.0,1.63,0.0,0.0,0.003
 K_c = 60; tau_c = 0.5 s,A: cancela el cero (fuente),0.9934,141.87,-96.92,25.88,19.06,-0.9934,30.0,0.037,19.75,0.3188,18.235,41.519
 K_c = 60; tau_c = 0.5 s,B: conserva el cero,0.358,81.81,-59.26,22.55,0.0,0.0,30.0,0.017,5.48,0.1915,0.0,0.004
 K_c = 60; tau_c = 0.5 s; omega_n = 40 rad/s,A: cancela el cero (fuente),0.9934,88.9,-68.62,11.09,9.2,-0.9934,21.3,0.0,4.05,0.0006,2.19,3.883

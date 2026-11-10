@@ -1,0 +1,17 @@
+{
+  "schemaVersion": 1,
+  "receiptId": "87ea9a80-cf88-4dc9-9fed-d66af9ee451c",
+  "status": "current",
+  "command": "deliver",
+  "type": "dataflow",
+  "input": "/home/angelrevelo/Documents/Brain-CanSAT/.archify/dataflow-lazo-rst-20261109-234634/candidate.json",
+  "output": "/home/angelrevelo/Documents/Brain-CanSAT/.archify/dataflow-lazo-rst-20261109-234634/lazo-rst.html",
+  "specification": {
+    "sha256": "e76129bbad02dbd3a20fe5e56c31528ef4d81f8631356fda832f8420561cad83",
+    "bytes": 8379
+  },
+  "artifact": {
+    "sha256": "7197639a7491206aa93639a629db9839383a6b3d150f5da5f31012251248a86d",
+    "bytes": 859900
+  }
+}

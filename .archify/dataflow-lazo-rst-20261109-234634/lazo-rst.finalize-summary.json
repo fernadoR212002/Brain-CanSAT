@@ -1,0 +1,145 @@
+{
+  "schemaVersion": 1,
+  "ok": true,
+  "command": "finalize",
+  "status": "pass",
+  "type": "dataflow",
+  "quality": "showcase",
+  "specification": {
+    "path": "/home/angelrevelo/Documents/Brain-CanSAT/.archify/dataflow-lazo-rst-20261109-234634/candidate.json",
+    "sha256": "e76129bbad02dbd3a20fe5e56c31528ef4d81f8631356fda832f8420561cad83",
+    "bytes": 8379
+  },
+  "artifact": {
+    "path": "/home/angelrevelo/Documents/Brain-CanSAT/.archify/dataflow-lazo-rst-20261109-234634/lazo-rst.html",
+    "sha256": "7197639a7491206aa93639a629db9839383a6b3d150f5da5f31012251248a86d",
+    "bytes": 859900
+  },
+  "gates": {
+    "validate": "pass",
+    "deliver": "pass",
+    "check": "pass",
+    "browser-check": "pass"
+  },
+  "diagnostics": [],
+  "diagnosticSummary": {
+    "total": 0,
+    "shown": 0,
+    "truncated": false
+  },
+  "evidence": {
+    "receipt": "/home/angelrevelo/Documents/Brain-CanSAT/.archify/dataflow-lazo-rst-20261109-234634/lazo-rst.finalize.json",
+    "summaryReceipt": "/home/angelrevelo/Documents/Brain-CanSAT/.archify/dataflow-lazo-rst-20261109-234634/lazo-rst.finalize-summary.json",
+    "browserCheckReceipt": "/home/angelrevelo/Documents/Brain-CanSAT/.archify/dataflow-lazo-rst-20261109-234634/lazo-rst.browser-check.json"
+  },
+  "update": {
+    "status": "current",
+    "installedVersion": "3.2.0",
+    "availableVersion": "3.2.0",
+    "releaseNotes": null,
+    "checkedAt": "2026-11-10T04:47:36.560Z",
+    "source": "network",
+    "noticeRequired": false,
+    "noticeText": null
+  },
+  "visualReview": "not-requested",
+  "durationMs": 15703,
+  "browserCheck": {
+    "requested": true,
+    "ran": true
+  },
+  "visualReviewRecommendation": {
+    "action": "inspect-route-readability",
+    "signals": {
+      "resolvedCrossovers": 3,
+      "routesOverSuggestedBends": 1
+    },
+    "reason": "Automated gates passed, but crossings or detours still need perceptual review before claiming visual quality.",
+    "affectedRoutes": {
+      "crossings": [
+        {
+          "left": {
+            "id": "f-psib",
+            "from": "estimador",
+            "to": "rumbo-camara",
+            "label": "ψ̂b",
+            "collectionIndex": 2,
+            "artifactIndex": 3
+          },
+          "right": {
+            "id": "f-theta",
+            "from": "planta",
+            "to": "codificador",
+            "label": "θ real",
+            "collectionIndex": 14,
+            "artifactIndex": 15
+          },
+          "point": [
+            315,
+            341
+          ]
+        },
+        {
+          "left": {
+            "id": "f-v",
+            "from": "pol-r",
+            "to": "saturacion",
+            "label": "v",
+            "collectionIndex": 9,
+            "artifactIndex": 10
+          },
+          "right": {
+            "id": "f-theta",
+            "from": "planta",
+            "to": "codificador",
+            "label": "θ real",
+            "collectionIndex": 14,
+            "artifactIndex": 15
+          },
+          "point": [
+            754,
+            341
+          ]
+        },
+        {
+          "left": {
+            "id": "f-commit",
+            "from": "saturacion",
+            "to": "pol-r",
+            "label": "u − u_ff",
+            "collectionIndex": 11,
+            "artifactIndex": 12
+          },
+          "right": {
+            "id": "f-theta",
+            "from": "planta",
+            "to": "codificador",
+            "label": "θ real",
+            "collectionIndex": 14,
+            "artifactIndex": 15
+          },
+          "point": [
+            736,
+            341
+          ]
+        }
+      ],
+      "detours": [
+        {
+          "relationship": {
+            "id": "f-theta",
+            "from": "planta",
+            "to": "codificador",
+            "label": "θ real",
+            "collectionIndex": 14,
+            "artifactIndex": 15
+          },
+          "bends": 4,
+          "stretch": 1
+        }
+      ],
+      "truncated": false
+    },
+    "repair": "Advisory only: this mode places or routes these relationships itself. Report them; do not remove relationships or meaning to reduce crossings."
+  }
+}

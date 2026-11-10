@@ -1,0 +1,115 @@
+{
+  "schema_version": 1,
+  "diagram_type": "dataflow",
+  "meta": {
+    "title": "Lazo RST de la cámara (L2 · L3)",
+    "locale": "es",
+    "output": ".archify/dataflow-lazo-rst-20261109-234634/lazo-rst.html",
+    "quality_profile": "showcase",
+    "repository": {
+      "url": "https://github.com/fernadoR212002/Brain-CanSAT.git",
+      "revision": "fcce52feb420333b9ba59e6e876ac8fbd655e163"
+    },
+    "legend": {
+      "entries": {
+        "emphasis": { "label": "camino de la referencia a la cámara" },
+        "default": { "label": "medición, estimación y perturbación" },
+        "dashed": { "label": "memoria de u pasada (anti-windup)" }
+      }
+    }
+  },
+  "stages": [
+    { "label": "Entradas (cada 10 ms)" },
+    { "label": "Estimación" },
+    { "label": "Polinomios T y S" },
+    { "label": "Ley de control" },
+    { "label": "Planta" }
+  ],
+  "nodes": [
+    { "id": "giroscopio", "type": "external", "label": "Giróscopo", "sublabel": "ω_b + sesgo + ruido", "tag": "IMU en el cuerpo", "stage": 0, "row": 0,
+      "sources": [ { "path": "sim/diseno-estabilizacion-camara.py", "line": 150, "end_line": 151, "label": "sesgo y ruido" }, { "path": "sim/diseno-estabilizacion-camara.py", "line": 178, "end_line": 183, "label": "medición" } ] },
+    { "id": "magnetometro", "type": "external", "label": "Magnetómetro", "sublabel": "ψ_mag, ruido 0,9°", "tag": "IMU en el cuerpo", "stage": 0, "row": 1,
+      "sources": [ { "path": "sim/diseno-estabilizacion-camara.py", "line": 152, "end_line": 152 }, { "path": "sim/diseno-estabilizacion-camara.py", "line": 179, "end_line": 179 } ] },
+    { "id": "codificador", "type": "external", "label": "Codificador", "sublabel": "θ cámara, 12 bits", "tag": "en el motor", "stage": 0, "row": 2,
+      "sources": [ { "path": "sim/diseno-estabilizacion-camara.py", "line": 153, "end_line": 153 }, { "path": "sim/diseno-estabilizacion-camara.py", "line": 184, "end_line": 184 } ] },
+    { "id": "referencia", "type": "frontend", "label": "Referencia ψ_ref", "sublabel": "0° → 90° a los 30 s", "tag": "C11", "stage": 0, "row": 3,
+      "sources": [ { "path": "sim/diseno-estabilizacion-camara.py", "line": 134, "end_line": 137 } ] },
+    { "id": "estimador", "type": "backend", "label": "Estimador de rumbo", "sublabel": "filtro complementario", "tag": "ψ̂b y sesgo b̂", "stage": 1, "row": 0,
+      "sources": [ { "path": "sim/diseno-estabilizacion-camara.py", "line": 154, "end_line": 155, "label": "polos del observador" }, { "path": "sim/diseno-estabilizacion-camara.py", "line": 185, "end_line": 191, "label": "actualización" } ] },
+    { "id": "rumbo-camara", "type": "backend", "label": "y = ψ̂b + θ", "sublabel": "rumbo de la cámara", "stage": 1, "row": 2,
+      "sources": [ { "path": "sim/diseno-estabilizacion-camara.py", "line": 207, "end_line": 207 } ] },
+    { "id": "pol-s", "type": "backend", "label": "S(q⁻¹)", "sublabel": "pesa y(k−i)", "tag": "realimentación", "stage": 2, "row": 2,
+      "sources": [ { "path": "sim/diseno-estabilizacion-camara.py", "line": 88, "end_line": 99, "label": "clase RST" }, { "path": "sim/diseno-estabilizacion-camara.py", "line": 79, "end_line": 85, "label": "diseño BI" } ] },
+    { "id": "pol-t", "type": "backend", "label": "T(q⁻¹)", "sublabel": "pesa ψ_ref(k−i)", "tag": "prealimentación", "stage": 2, "row": 3,
+      "sources": [ { "path": "sim/diseno-estabilizacion-camara.py", "line": 88, "end_line": 99, "label": "clase RST" }, { "path": "sim/diseno-estabilizacion-camara.py", "line": 79, "end_line": 85, "label": "diseño BI" } ] },
+    { "id": "prealimentacion", "type": "backend", "label": "Prealimentación", "sublabel": "u_ff = −ω̂b / Kc", "tag": "solo L3 y L5", "stage": 3, "row": 0,
+      "sources": [ { "path": "sim/diseno-estabilizacion-camara.py", "line": 209, "end_line": 214 } ] },
+    { "id": "saturacion", "type": "backend", "label": "Saturación ±6 V", "sublabel": "u = v + u_ff", "stage": 3, "row": 1,
+      "sources": [ { "path": "sim/diseno-estabilizacion-camara.py", "line": 25, "end_line": 25 }, { "path": "sim/diseno-estabilizacion-camara.py", "line": 215, "end_line": 217 } ] },
+    { "id": "pol-r", "type": "backend", "label": "1 / R(q⁻¹)", "sublabel": "R = (z−1)·R1", "tag": "integrador", "stage": 3, "row": 2,
+      "sources": [ { "path": "sim/diseno-estabilizacion-camara.py", "line": 79, "end_line": 85 }, { "path": "sim/diseno-estabilizacion-camara.py", "line": 97, "end_line": 101, "label": "step y commit" } ] },
+    { "id": "giro-cuerpo", "type": "external", "label": "Giro del cuerpo", "sublabel": "perturbación ψ̈b", "tag": "escenarios S1, S2", "stage": 4, "row": 0,
+      "sources": [ { "path": "sim/diseno-estabilizacion-camara.py", "line": 104, "end_line": 132 } ] },
+    { "id": "planta", "type": "external", "label": "Motor + cámara", "sublabel": "Kc / (s(τs+1))", "tag": "Kc=30, τ=0,1 s", "stage": 4, "row": 1,
+      "sources": [ { "path": "sim/diseno-estabilizacion-camara.py", "line": 26, "end_line": 26, "label": "planta ilustrativa" }, { "path": "sim/diseno-estabilizacion-camara.py", "line": 224, "end_line": 231, "label": "integración RK4" } ] }
+  ],
+  "flows": [
+    { "id": "f-omega", "from": "giroscopio", "to": "estimador", "label": "ω_b medido" },
+    { "id": "f-psimag", "from": "magnetometro", "to": "estimador", "label": "ψ_mag" },
+    { "id": "f-psib", "from": "estimador", "to": "rumbo-camara", "label": "ψ̂b" },
+    { "id": "f-theta-enc", "from": "codificador", "to": "rumbo-camara", "label": "θ_enc" },
+    { "id": "f-y", "from": "rumbo-camara", "to": "pol-s", "label": "y" },
+    { "id": "f-ref", "from": "referencia", "to": "pol-t", "label": "ψ_ref", "variant": "emphasis" },
+    { "id": "f-sy", "from": "pol-s", "to": "pol-r", "label": "− S·y" },
+    { "id": "f-tr", "from": "pol-t", "to": "pol-r", "label": "+ T·ψ_ref", "variant": "emphasis" },
+    { "id": "f-omega-hat", "from": "estimador", "to": "prealimentacion", "label": "ω̂b = ω − b̂" },
+    { "id": "f-v", "from": "pol-r", "to": "saturacion", "label": "v", "variant": "emphasis" },
+    { "id": "f-uff", "from": "prealimentacion", "to": "saturacion", "label": "u_ff" },
+    { "id": "f-commit", "from": "saturacion", "to": "pol-r", "label": "u − u_ff", "variant": "dashed" },
+    { "id": "f-u", "from": "saturacion", "to": "planta", "label": "u [V] (ZOH)", "variant": "emphasis" },
+    { "id": "f-pert", "from": "giro-cuerpo", "to": "planta", "label": "ψ̈b" },
+    { "id": "f-theta", "from": "planta", "to": "codificador", "label": "θ real" }
+  ],
+  "cards": [
+    {
+      "dot": "cyan",
+      "title": "Qué calcula el RST en cada muestra",
+      "items": [
+        "Ley: R(q⁻¹)·u = T(q⁻¹)·ψ_ref − S(q⁻¹)·y",
+        "En diferencias: u(k) = Σ Tᵢ·ψ_ref(k−i) − Σ Sᵢ·y(k−i) − Σ Rᵢ·u(k−i), con i ≥ 1 en el último término",
+        "T actúa sobre la referencia, S sobre la medición y R sobre las salidas pasadas del controlador",
+        "Periodo T = 10 ms (100 Hz); la IMU llega con una muestra de retraso"
+      ]
+    },
+    {
+      "dot": "violet",
+      "title": "Cómo se diseñan R, S y T (rst_design)",
+      "items": [
+        "Planta discreta por ZOH: B/A = (b1·z + b0) / ((z−1)(z−p))",
+        "Polos deseados Am: ωn = 20 rad/s y ζ = 0,7; observador Ao unas 2 veces más rápido",
+        "Ecuación diofantina A·(z−1)·R1 + B·S = Am·Ao; luego R = (z−1)·R1 aporta la acción integral",
+        "T = Km·Ao, con Km = Am(1)/B(1), para ganancia unitaria en estado estacionario"
+      ]
+    },
+    {
+      "dot": "amber",
+      "title": "Variantes del mismo esquema",
+      "items": [
+        "L1a: R = B⁺, cancela el cero de muestreo y produce zumbido en u",
+        "L1b: conserva el cero, sin integrador",
+        "L2: el esquema sin la prealimentación",
+        "L3: L2 más u_ff = −ω̂b/Kc, que anula el giro del cuerpo antes de que aparezca el error",
+        "L5: L3 con Kc estimada en vuelo (RLS escalar)"
+      ]
+    },
+    {
+      "dot": "rose",
+      "title": "Para leerlo bien",
+      "items": [
+        "Anti-windup: la memoria de R guarda la u ya saturada, sin u_ff",
+        "El giro del cuerpo también lo miden el giróscopo y el magnetómetro; esa flecha no se dibuja",
+        "Kc, τ, 6 V y los ruidos son ilustrativos (Sin fuente en raw/): el servo aún no se ha identificado"
+      ]
+    }
+  ]
+}
