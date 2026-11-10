@@ -7,3 +7,4 @@ Planes, análisis y veredictos de pruebas (TST-NNN). Un vuelo también es una pr
 ## Notas
 
 - [tst-001-exploracion-sensores-celular.md](tst-001-exploracion-sensores-celular.md) — TST-001: exploración del giróscopo y el magnetómetro con un celular (phyphox); prueba exploratoria, sin requisito.
+- [tst-002-guia-datos-estacionarios-sensores.md](tst-002-guia-datos-estacionarios-sensores.md) — TST-002: guía de laboratorio para tomar datos estacionarios del BNO055 y el LIS3MDL reales en el ESP32-S3, y la interferencia del servo; planificada.

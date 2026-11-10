@@ -96,3 +96,18 @@ Diario del brain. **Solo crece:** cada entrada se agrega al final con el encabez
 - Nuevo [RSK-001](Riesgos/rsk-001-rango-servo-camara.md): el servo Futaba de 180° gasta la mitad de su recorrido en el giro de 90° de C11. Nivel medio, pendiente de medir el giro real.
 - Matiz a la caracterización: bajo el paracaídas el acelerómetro no ve el balanceo (P3 de la nota), así que la inclinación para nivelar el magnetómetro debe salir de la fusión con giróscopos. **Pendiente:** verificarlo con un péndulo.
 - **Pendiente:** DEC-001 (los pesos los acuerda el equipo), los RC del lazo de rumbo y los TST de identificación en banco y de caída desde dron.
+
+## 2026-11-10 · prueba · TST-002, guía de laboratorio de datos estacionarios de los sensores
+
+- Pedido del líder: un documento para el compañero de ingeniería eléctrica que diga qué datos de los sensores se necesitan y cómo tomarlos, sin vuelo, porque por ahora solo hay datos estacionarios.
+- Nueva nota [TST-002](Pruebas/tst-002-guia-datos-estacionarios-sensores.md) (planificada), que incluye:
+  - una tabla de qué dato se necesita, para qué y qué valor supuesto reemplaza en `sim/`;
+  - siete criterios: PQ28, PQ30 y PQ29 como requisitos; ruido de rumbo, sesgo, campo del servo y campo calibrado como supuestos de diseño;
+  - el montaje con el ESP32-S3, el BNO055, el LIS3MDL y el servo;
+  - la configuración del firmware y el formato CSV;
+  - los ensayos E0 a E4: verificación, quieto corto con apagados, quieto largo, poses estáticas e interferencia del servo a 30, 60, 110 y 220 mm;
+  - la bitácora.
+- Contexto de la conversación: el líder pide estimar la planta en línea (perturbaciones y modelo cambiante), con acción de control de 0 a 5 V, servo por PWM y ESP32. Los umbrales del estimador en línea dependen del ruido que mide esta prueba.
+- Exportada a PDF para compartir: `salida/tst-002-guia-laboratorio-sensores.pdf`.
+- **Pendiente:** responsable, sitio de la prueba, modelo del servo (`Servos.pdf` sigue en `raw/inbox/` sin procesar) y las hojas de datos L-08 y L-09 para confirmar modos y registros.
+

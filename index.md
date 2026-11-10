@@ -25,7 +25,7 @@ Enlaces externos ([raw/LINKS.md](raw/LINKS.md)): L-01 modelo WMM2025 (NOAA) · L
 | [Control/](Control/README.md) | [alcance.md](Control/alcance.md): alcance del frente de control (con pendientes) · [diseno-estabilizacion-camara.md](Control/diseno-estabilizacion-camara.md): opciones de control del lazo de la cámara (L0 a L8), simulación y identificabilidad · [modelo-rumbo-espacio-estados.md](Control/modelo-rumbo-espacio-estados.md): modelo del lazo de rumbo con sus matrices A, B, C, D |
 | [Subsistemas/](Subsistemas/README.md) | _(sin notas)_ |
 | [Decisiones/](Decisiones/README.md) | _(sin notas)_ |
-| [Pruebas/](Pruebas/README.md) | [tst-001-exploracion-sensores-celular.md](Pruebas/tst-001-exploracion-sensores-celular.md): TST-001, giróscopo y magnetómetro con un celular |
+| [Pruebas/](Pruebas/README.md) | [tst-001-exploracion-sensores-celular.md](Pruebas/tst-001-exploracion-sensores-celular.md): TST-001, giróscopo y magnetómetro con un celular · [tst-002-guia-datos-estacionarios-sensores.md](Pruebas/tst-002-guia-datos-estacionarios-sensores.md): TST-002, guía de laboratorio de datos estacionarios de los sensores reales (planificada) |
 | [Riesgos/](Riesgos/README.md) | [rsk-001-rango-servo-camara.md](Riesgos/rsk-001-rango-servo-camara.md): RSK-001, recorrido del servo de la cámara |
 | [Conceptos/](Conceptos/README.md) | [sensores-giroscopio-magnetometro.md](Conceptos/sensores-giroscopio-magnetometro.md): qué miden, Bogotá–Medellín–Virginia, leyes físicas, requisitos y caracterización · [l-07-servomotor-self-tuning.md](Conceptos/l-07-servomotor-self-tuning.md): L-07, seguidor de un modelo de referencia (RLS + RST) |
 | [Entregas/](Entregas/README.md) | _(sin notas)_ |
@@ -37,7 +37,7 @@ Enlaces externos ([raw/LINKS.md](raw/LINKS.md)): L-01 modelo WMM2025 (NOAA) · L
 
 | RQ | RC | DEC | TST | RSK | ICD | DS | L | ACT | REV |
 |---|---|---|---|---|---|---|---|---|---|
-| — | — | — | TST-001 | RSK-001 | — | — | L-15 | — | — |
+| — | — | — | TST-002 | RSK-001 | — | — | L-15 | — | — |
 
 ## Derivados (`derivados/`)
 
@@ -56,6 +56,7 @@ Enlaces externos ([raw/LINKS.md](raw/LINKS.md)): L-01 modelo WMM2025 (NOAA) · L
 ## Salidas (`salida/`)
 
 - [matriz-requisitos.csv](salida/matriz-requisitos.csv): matriz de trazabilidad (vacía, con encabezados).
+- [tst-002-guia-laboratorio-sensores.pdf](salida/tst-002-guia-laboratorio-sensores.pdf): TST-002 exportada a PDF para compartir con eléctrica (la fuente de verdad es la nota).
 - [figuras/diseno-estabilizacion-camara.png](salida/figuras/diseno-estabilizacion-camara.png): error de la cámara en S2 y zumbido del cero cancelado.
 - [figuras/l-07-reproduccion-str.png](salida/figuras/l-07-reproduccion-str.png) y [figuras/l-07-cero-de-muestreo.png](salida/figuras/l-07-cero-de-muestreo.png): figuras del ejemplo L-07.
 
