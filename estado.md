@@ -27,7 +27,7 @@ Nuevo:
 
 - [TST-003](Pruebas/tst-003-bno055-sin-calibrar-esp32-matlab.md) es la primera lectura del BNO055 real sin calibrar (ESP32 clásico, MATLAB en vivo). Llegaron solo capturas, sin CSV. A ojo, el rumbo sin calibrar se desvía del orden de 20°. La ley L3 no cambia, pero la calibración del magnetómetro pasa a ser la ruta crítica, y el lazo debe ir a 100 Hz ([sección 9 del diseño](Control/diseno-estabilizacion-camara.md)).
 - Réplica de L3 en Simulink con colores por función: [simulink_lazo_camara_l3.m](sim/simulink_lazo_camara_l3.m) → [lazo_camara_l3.slx](sim/lazo_camara_l3.slx). Da 3,01° en S1 y 2,60° en S2, y cuadra con Python.
-- Presentación para el equipo, 7 diapositivas con three.js: el control explicado con los colores del modelo, el trabajo de Luis con el BNO055 y la prueba con el recovery que falta ([fuente](salida/presentacion-control-camara/index.html) · [Artifact](https://claude.ai/artifact/7NkQKFxgatcrG7yPeDGqz4)).
+- Presentación para el equipo, 7 diapositivas con three.js: el control explicado con los colores del modelo, el trabajo de Luis con el BNO055 y la prueba con el recovery que falta ([fuente](salida/presentacion-control-camara/index.html) · [Artifact](https://claude.ai/artifact/7NkQKFxgatcrG7yPeDGqz4) · [archivo para enviar](salida/presentacion-control-camara.html)).
 
 Antes: [TST-002](Pruebas/tst-002-guia-datos-estacionarios-sensores.md), guía de laboratorio para que eléctrica tome datos estacionarios del BNO055 y el LIS3MDL reales y mida la interferencia del servo ([PDF](salida/tst-002-guia-laboratorio-sensores.pdf)).
 

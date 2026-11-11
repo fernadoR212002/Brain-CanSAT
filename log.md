@@ -174,3 +174,22 @@ Diario del brain. **Solo crece:** cada entrada se agrega al final con el encabez
   7. lo que sigue: filtro en banco, calibración 3D, registro a 100 Hz, medir el motor y la prueba de caída desde dron con el recovery.
 - Los números salen de [simulink-lazo-camara-l3-metricas.csv](derivados/simulink-lazo-camara-l3-metricas.csv), de TST-003 y de la sección 9 del diseño. Las animaciones son ilustraciones y la página lo dice.
 - En el mismo commit van el [lazo_camara_l3.slx](sim/lazo_camara_l3.slx) y las dos figuras de `salida/figuras/` que el líder regeneró al correr el script en MATLAB, y la carpeta de archify del diagrama, sin las capturas de la revisión visual.
+
+## 2026-11-11 · salida · Versión de un solo archivo de la presentación
+
+- Pedido del líder: un archivo de la presentación para exportarlo y enviarlo al equipo.
+- Nuevo [exportar-presentacion.py](scripts/exportar-presentacion.py), solo con la biblioteca estándar. Escribe [presentacion-control-camara.html](salida/presentacion-control-camara.html), de 2,7 MB. Lleva adentro:
+  - las 7 capturas, en base64;
+  - el diagrama de archify, por `srcdoc`, con un botón de pantalla completa en lugar del enlace;
+  - una nota para quien lo recibe.
+- Revisado en Chromium, abierto directo del disco:
+  - carga la escena 3D;
+  - el diagrama se dibuja dentro de la página;
+  - aparecen las 7 imágenes y funciona la lupa;
+  - la consola no muestra errores.
+- Sin JavaScript, como en la vista previa de WhatsApp en iPhone, la página se sigue leyendo: el texto, las imágenes y las barras. Lo que se pierde:
+  - la escena 3D;
+  - los visores animados;
+  - el círculo interactivo del magnetómetro;
+  - la lupa.
+- La escena 3D (three.js, cdnjs) y las tipografías se cargan de internet. La fuente de verdad sigue siendo la carpeta `salida/presentacion-control-camara/`, y el archivo se regenera con el script.

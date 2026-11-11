@@ -58,7 +58,7 @@ Enlaces externos ([raw/LINKS.md](raw/LINKS.md)): L-01 modelo WMM2025 (NOAA) · L
 ## Simulación y herramientas
 
 - [sim/requirements.txt](sim/requirements.txt): entorno de simulación. Scripts de `sim/`: [campo-geomagnetico.py](sim/campo-geomagnetico.py) · [caracterizacion-sensores.py](sim/caracterizacion-sensores.py) · [modelo-rumbo.py](sim/modelo-rumbo.py) · [l-07-servomotor-self-tuning.py](sim/l-07-servomotor-self-tuning.py) · [diseno-estabilizacion-camara.py](sim/diseno-estabilizacion-camara.py) · [servo-prueba-futaba.m](sim/servo-prueba-futaba.m) (MATLAB, prueba de banco del servo) · [simulink_lazo_camara_l3.m](sim/simulink_lazo_camara_l3.m) (MATLAB, construye y corre el modelo de Simulink [lazo_camara_l3.slx](sim/lazo_camara_l3.slx) de L3, con colores por función).
-- [scripts/matriz-requisitos.py](scripts/matriz-requisitos.py) · [scripts/lint.py](scripts/lint.py) · [scripts/brain.py](scripts/brain.py).
+- [scripts/matriz-requisitos.py](scripts/matriz-requisitos.py) · [scripts/lint.py](scripts/lint.py) · [scripts/brain.py](scripts/brain.py) · [scripts/exportar-presentacion.py](scripts/exportar-presentacion.py) (empaca la presentación en un solo HTML para enviarla).
 
 ## Salidas (`salida/`)
 
@@ -67,6 +67,7 @@ Enlaces externos ([raw/LINKS.md](raw/LINKS.md)): L-01 modelo WMM2025 (NOAA) · L
 - [figuras/diseno-estabilizacion-camara.png](salida/figuras/diseno-estabilizacion-camara.png): error de la cámara en S2 y zumbido del cero cancelado.
 - [figuras/simulink-lazo-camara-l3.png](salida/figuras/simulink-lazo-camara-l3.png): error de la cámara con L3 en Simulink (S1 y S2); [figuras/simulink-lazo-camara-l3-modelo.png](salida/figuras/simulink-lazo-camara-l3-modelo.png): el diagrama de Simulink con los colores por función.
 - [presentacion-control-camara/](salida/presentacion-control-camara/index.html): presentación para el equipo (7 diapositivas con three.js) del control de la cámara y del trabajo con el BNO055, con las capturas originales y el diagrama archify del lazo por colores. Artifact privado: https://claude.ai/artifact/7NkQKFxgatcrG7yPeDGqz4.
+- [presentacion-control-camara.html](salida/presentacion-control-camara.html): la misma presentación en un solo archivo (2,7 MB) para enviar por WhatsApp, correo o Drive, con las imágenes y el diagrama adentro; la genera `scripts/exportar-presentacion.py`.
 - [figuras/l-07-reproduccion-str.png](salida/figuras/l-07-reproduccion-str.png) y [figuras/l-07-cero-de-muestreo.png](salida/figuras/l-07-cero-de-muestreo.png): figuras del ejemplo L-07.
 
 ## Memoria, guías y configuración
