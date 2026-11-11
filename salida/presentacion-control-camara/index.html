@@ -1,0 +1,1205 @@
+<title>Que el suelo no gire</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&family=Instrument+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Layout: cielo 3D fijo detrás; siete diapositivas que bajan como el PocketQube.
+   Texto a la izquierda, escena a la derecha; bandas anchas para figuras.
+   Color: los nueve colores del modelo de Simulink son la paleta; el resto es cielo y tinta. */
+:root {
+  --modo: 0;
+  --sky-hi: #c4d8ec; --sky-lo: #edf2f7; --fog: #dbe6f1;
+  --ink: #0e1a2b; --ink-2: #3a4a5e; --ink-3: #5f6f84;
+  --panel: rgba(247, 250, 253, 0.9); --panel-solid: #f6f9fc; --line: rgba(14, 26, 43, 0.14); --focus: #1f5fc4;
+  --c-ref: #1f7a43; --c-pert: #c93a3a; --c-sens: #846800; --c-sens-viva: #e2b70a; --c-est: #6a4ccc; --c-ctrl: #2c60c4;
+  --c-ff: #087a88; --c-act: #a85508; --c-plan: #ad3aa1; --c-med: #687282;
+  --s-ref: #b8e6b8; --s-pert: #ffb3b3; --s-ctrl: #a8ccff; --s-ff: #adf2f2; --s-act: #ffd18c;
+  --s-plan: #f2bdf2; --s-sens: #ffff9e; --s-est: #d1bdff; --s-med: #dedede; --s-ink: #1b1f24;
+  --f-display: 'Barlow Condensed', 'Arial Narrow', 'Roboto Condensed', sans-serif;
+  --f-text: 'Instrument Sans', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --f-mono: 'JetBrains Mono', ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --modo: 1;
+    --sky-hi: #040a16; --sky-lo: #0c182b; --fog: #0a1527;
+    --ink: #e8eef7; --ink-2: #b6c3d3; --ink-3: #8a9bb0;
+    --panel: rgba(10, 18, 33, 0.86); --panel-solid: #0c1729; --line: rgba(232, 238, 247, 0.15); --focus: #8cb8ff;
+    --c-ref: #5cd18a; --c-pert: #ff7b7b; --c-sens: #f2d04b; --c-sens-viva: #f2d04b; --c-est: #ad97ff; --c-ctrl: #7ea8ff;
+    --c-ff: #4fd3e2; --c-act: #ffa95a; --c-plan: #f08be4; --c-med: #a5afbf;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --modo: 1;
+  --sky-hi: #040a16; --sky-lo: #0c182b; --fog: #0a1527;
+  --ink: #e8eef7; --ink-2: #b6c3d3; --ink-3: #8a9bb0;
+  --panel: rgba(10, 18, 33, 0.86); --panel-solid: #0c1729; --line: rgba(232, 238, 247, 0.15); --focus: #8cb8ff;
+  --c-ref: #5cd18a; --c-pert: #ff7b7b; --c-sens: #f2d04b; --c-sens-viva: #f2d04b; --c-est: #ad97ff; --c-ctrl: #7ea8ff;
+  --c-ff: #4fd3e2; --c-act: #ffa95a; --c-plan: #f08be4; --c-med: #a5afbf;
+  color-scheme: dark;
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+body {
+  margin: 0;
+  background: var(--sky-lo);
+  color: var(--ink);
+  font-family: var(--f-text);
+  font-size: 1.0625rem;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+img { max-width: 100%; }
+a { color: inherit; text-underline-offset: 3px; }
+:focus-visible { outline: 2.5px solid var(--focus); outline-offset: 3px; border-radius: 6px; }
+
+/* ---------- escena fija */
+#cielo {
+  position: fixed; inset: 0; width: 100%; height: 100%; z-index: 0; display: block; pointer-events: none;
+  background: linear-gradient(180deg, var(--sky-hi) 0%, var(--sky-lo) 78%);
+}
+#etiquetas { position: fixed; inset: 0; z-index: 1; pointer-events: none; overflow: hidden; }
+.tag { position: absolute; left: 0; top: 0; opacity: 0; transition: opacity .45s ease; will-change: transform; }
+.tag.on { opacity: 1; }
+.tag i {
+  position: absolute; left: -5px; top: -5px; width: 10px; height: 10px; border-radius: 50%;
+  background: var(--c); box-shadow: 0 0 0 3px color-mix(in srgb, var(--c) 28%, transparent);
+}
+.tag span {
+  position: absolute; left: 14px; top: 0; transform: translateY(-50%); white-space: nowrap;
+  font: 600 .78rem/1.2 var(--f-text); color: var(--ink); background: var(--panel);
+  border: 1px solid color-mix(in srgb, var(--c) 45%, var(--line)); padding: 5px 10px; border-radius: 999px;
+}
+.tag[data-lado="izq"] span { left: auto; right: 14px; }
+@media (max-width: 899px) { #etiquetas { display: none; } }
+.sin-3d #etiquetas { display: none; }
+
+.progreso { position: fixed; top: env(safe-area-inset-top, 0px); left: 0; right: 0; height: 3px; z-index: 6; pointer-events: none; }
+.progreso span {
+  display: block; height: 100%; transform-origin: 0 50%; transform: scaleX(0);
+  background: linear-gradient(90deg, var(--s-ref), var(--s-pert), var(--s-sens), var(--s-est), var(--s-ctrl), var(--s-ff), var(--s-act), var(--s-plan), var(--s-med));
+}
+
+.riel { position: fixed; right: calc(14px + env(safe-area-inset-right, 0px)); top: 50%; transform: translateY(-50%); z-index: 5; }
+.riel ol { position: relative; list-style: none; margin: 0; padding: 0; display: grid; gap: 12px; }
+.riel ol::before { content: ""; position: absolute; right: 4.5px; top: 6px; bottom: 6px; width: 1px; background: var(--line); }
+.riel a {
+  display: flex; align-items: center; justify-content: flex-end; gap: 10px; text-decoration: none;
+  color: var(--ink-3); font: 600 .7rem/1 var(--f-mono); letter-spacing: .08em; text-transform: uppercase;
+}
+.riel .nom { opacity: 0; transform: translateX(6px); transition: opacity .25s, transform .25s; background: var(--panel); padding: 4px 8px; border-radius: 999px; }
+.riel a:hover .nom, .riel a:focus-visible .nom, .riel a[aria-current="true"] .nom { opacity: 1; transform: none; }
+.riel .marca { position: relative; width: 10px; height: 10px; border-radius: 50%; border: 1.5px solid currentColor; background: var(--sky-lo); flex: none; }
+.riel a[aria-current="true"] { color: var(--ink); }
+.riel a[aria-current="true"] .marca { background: var(--ink); }
+@media (max-width: 899px) { .riel { display: none; } }
+
+/* ---------- diapositivas */
+main { position: relative; z-index: 2; }
+.slide {
+  position: relative; min-height: 100vh; display: flex; flex-direction: column; justify-content: center;
+  gap: clamp(20px, 3.5vh, 40px); padding-block: clamp(80px, 16vh, 170px);
+}
+.panel, .band {
+  background: var(--panel); border: 1px solid var(--line); border-radius: 18px;
+  -webkit-backdrop-filter: blur(10px) saturate(1.1); backdrop-filter: blur(10px) saturate(1.1);
+  box-shadow: 0 22px 60px -38px rgba(8, 18, 36, .55);
+}
+.panel { width: min(100%, 640px); margin-left: clamp(0px, 3vw, 56px); padding: clamp(22px, 3vw, 38px); display: grid; gap: 16px; }
+.band { width: min(100%, 1180px); margin-inline: auto; padding: clamp(18px, 2.6vw, 34px); display: grid; gap: clamp(18px, 2.4vw, 28px); }
+.panel > *, .band > * { min-width: 0; margin: 0; }
+@media (max-width: 899px) {
+  .slide { padding-block: 30vh 8vh; }
+  .panel { margin-left: 0; }
+}
+
+.ceja { font: 600 .74rem/1.3 var(--f-mono); letter-spacing: .1em; text-transform: uppercase; color: var(--ink-3); display: flex; gap: 10px; align-items: center; }
+.ceja b { color: var(--ink); font-weight: 600; }
+h1, h2, h3 { text-wrap: balance; }
+h2 { font-family: var(--f-display); font-weight: 700; font-size: clamp(2.3rem, 5vw, 3.8rem); line-height: .98; letter-spacing: .002em; margin: 0; }
+h3 { font-family: var(--f-text); font-weight: 600; font-size: 1.125rem; line-height: 1.3; margin: 0; }
+p { margin: 0; max-width: 66ch; }
+.lead { font-size: 1.16rem; color: var(--ink-2); }
+.peque { font-size: .875rem; color: var(--ink-2); }
+.mono { font-family: var(--f-mono); font-size: .86em; }
+.dos { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 340px), 1fr)); gap: clamp(18px, 2.4vw, 32px); align-items: start; }
+.dos > * { min-width: 0; }
+.pila { display: grid; gap: 12px; align-content: start; }
+.c { color: var(--c); font-weight: 600; }
+
+/* ---------- portada */
+.slide--hero { justify-content: flex-end; padding-bottom: clamp(56px, 10vh, 120px); }
+.hero { width: min(100%, 720px); margin-left: clamp(0px, 3vw, 56px); display: grid; gap: 22px; }
+.hero-cuerpo {
+  max-width: 41rem; display: grid; gap: 16px; padding: clamp(18px, 2.4vw, 26px);
+  background: var(--panel); border: 1px solid var(--line); border-radius: 18px;
+  -webkit-backdrop-filter: blur(10px) saturate(1.1); backdrop-filter: blur(10px) saturate(1.1);
+  box-shadow: 0 22px 60px -38px rgba(8, 18, 36, .55);
+}
+.hero-cuerpo > * { margin: 0; min-width: 0; }
+@media (max-width: 899px) { .slide--hero { justify-content: flex-start; padding-top: 50vh; } }
+.hero h1 {
+  font-family: var(--f-display); font-weight: 700; text-transform: uppercase; margin: 0;
+  font-size: clamp(3.6rem, 10.5vw, 8.6rem); line-height: .88; letter-spacing: .004em;
+}
+.hero .lead { max-width: 36rem; }
+.autores { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 250px), 1fr)); gap: 12px; max-width: 40rem; }
+.autor { display: grid; gap: 4px; align-content: start; }
+.autor b { font-size: 1.02rem; }
+.autor span { font-size: .9rem; color: var(--ink-2); }
+.autor .franja { height: 4px; border-radius: 2px; margin-bottom: 6px; }
+.autor .franja.calida { background: linear-gradient(90deg, var(--s-pert), var(--s-sens), var(--s-act), var(--s-plan)); }
+.autor .franja.fria { background: linear-gradient(90deg, var(--s-est), var(--s-ctrl), var(--s-ff)); }
+.baja { display: flex; align-items: center; gap: 10px; font: 600 .74rem/1 var(--f-mono); letter-spacing: .1em; text-transform: uppercase; color: var(--ink-3); }
+.baja svg { width: 14px; height: 14px; animation: baja 1.8s ease-in-out infinite; }
+@keyframes baja { 0%, 100% { transform: translateY(-2px); } 50% { transform: translateY(3px); } }
+@media (prefers-reduced-motion: reduce) { .baja svg { animation: none; } }
+
+/* ---------- texto oficial */
+.guia { border: 1px solid var(--line); border-radius: 12px; padding: 14px 16px; display: grid; gap: 8px; background: var(--panel-solid); }
+.guia p { font: 400 .84rem/1.5 var(--f-mono); color: var(--ink-2); max-width: none; }
+.guia p b { color: var(--ink); font-weight: 600; margin-right: 6px; }
+.guia .peque { font-family: var(--f-text); }
+
+/* ---------- visores */
+.visores { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr)); gap: 18px; }
+.visor { display: grid; gap: 10px; align-content: start; }
+.visor-cab { display: flex; flex-wrap: wrap; gap: 4px 10px; align-items: baseline; }
+.visor-cab b { font-family: var(--f-display); font-size: 1.45rem; line-height: 1; letter-spacing: .01em; }
+.visor-cab span { font-size: .88rem; color: var(--ink-2); }
+.visor canvas { width: 100%; max-width: 100%; aspect-ratio: 4 / 3; height: auto; display: block; border-radius: 12px; background: #86975f; border: 1px solid var(--line); }
+.medidor { display: grid; gap: 4px; }
+.pista {
+  position: relative; height: 10px; border-radius: 5px;
+  background: linear-gradient(90deg,
+    color-mix(in srgb, var(--c-pert) 26%, transparent) 0 33.33%,
+    color-mix(in srgb, var(--c-ref) 34%, transparent) 33.33% 66.67%,
+    color-mix(in srgb, var(--c-pert) 26%, transparent) 66.67% 100%);
+}
+.pista i { position: absolute; top: -4px; left: 50%; width: 4px; height: 18px; margin-left: -2px; border-radius: 2px; background: var(--ink); }
+.pista i.fuera { background: var(--c-pert); }
+.escala { position: relative; height: 1.2em; font: 400 .7rem/1.2 var(--f-mono); color: var(--ink-3); }
+.escala span { position: absolute; top: 0; transform: translateX(-50%); white-space: nowrap; }
+.escala span:first-child { transform: none; }
+.escala span:last-child { transform: translateX(-100%); }
+.lectura { font-size: .92rem; color: var(--ink-2); font-variant-numeric: tabular-nums; }
+.lectura output { font-family: var(--f-mono); font-weight: 600; color: var(--ink); }
+.ilus { font: 600 .7rem/1.2 var(--f-mono); letter-spacing: .08em; text-transform: uppercase; color: var(--ink-3); }
+
+/* ---------- tubería de hardware */
+.tubo { display: flex; flex-wrap: wrap; align-items: stretch; gap: 8px; }
+.nodo { flex: 1 1 150px; min-width: 0; border-radius: 12px; padding: 10px 12px; background: var(--sw); color: var(--s-ink); border: 1.5px solid var(--c); display: grid; gap: 2px; }
+.nodo b { font-size: .98rem; }
+.nodo span { font: 400 .74rem/1.35 var(--f-mono); }
+.flechita { align-self: center; color: var(--ink-3); font: 600 .72rem/1.2 var(--f-mono); text-align: center; flex: 0 1 auto; display: grid; justify-items: center; }
+.flechita::after { content: "→"; font-size: 1.1rem; line-height: 1; color: var(--ink-2); }
+@media (max-width: 560px) { .flechita { flex-basis: 100%; } .flechita::after { content: "↓"; } }
+
+/* ---------- figuras */
+.galeria { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr)); gap: 18px; }
+.fig { margin: 0; display: grid; gap: 8px; align-content: start; min-width: 0; }
+.fig-btn { display: block; width: 100%; padding: 0; border: 1px solid var(--line); border-radius: 10px; overflow: hidden; background: var(--panel-solid); cursor: zoom-in; }
+.fig-btn img { display: block; width: 100%; height: auto; }
+.fig figcaption { font-size: .875rem; line-height: 1.5; color: var(--ink-2); }
+.fig figcaption b { color: var(--ink); font-weight: 600; }
+
+/* ---------- leyenda de colores */
+.regla { display: grid; gap: 10px; }
+.regla-fila { display: grid; grid-template-columns: 92px 1fr; gap: 12px; align-items: center; }
+.regla-fila .tiras { display: flex; height: 18px; border-radius: 5px; overflow: hidden; border: 1px solid var(--line); }
+.regla-fila .tiras i { flex: 1; background: var(--sw); }
+.grupos { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 330px), 1fr)); gap: 18px; align-items: start; }
+.grupo { display: grid; gap: 10px; align-content: start; }
+.grupo-tit { font: 600 .74rem/1.3 var(--f-mono); letter-spacing: .1em; text-transform: uppercase; color: var(--ink-3); }
+.chip { display: grid; grid-template-columns: 44px 1fr; gap: 2px 12px; align-items: start; padding: 12px 14px; border-radius: 12px; background: var(--panel-solid); border: 1px solid var(--line); }
+.chip .muestra { grid-row: span 2; width: 44px; height: 30px; border-radius: 6px; background: var(--sw); border: 1.5px solid var(--c); margin-top: 2px; }
+.chip b { font-weight: 600; color: var(--c); line-height: 1.3; }
+.chip span { font-size: .92rem; line-height: 1.45; color: var(--ink-2); }
+
+.vuelta { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 150px), 1fr)); gap: 10px; counter-reset: paso; }
+.vuelta li { counter-increment: paso; display: grid; gap: 6px; align-content: start; padding: 12px; border-radius: 12px; background: var(--panel-solid); border: 1px solid var(--line); font-size: .92rem; line-height: 1.4; }
+.vuelta li::before { content: counter(paso); font: 700 1.5rem/1 var(--f-display); color: var(--c); }
+.vuelta li .tira { height: 4px; border-radius: 2px; background: var(--sw); border: 1px solid var(--c); }
+
+.embed { position: relative; border-radius: 14px; overflow: hidden; border: 1px solid var(--line); background: #0b1220; }
+.embed iframe { display: block; width: 100%; height: clamp(420px, 72vh, 720px); border: 0; }
+.escudo { position: absolute; inset: 0; width: 100%; display: flex; align-items: flex-end; justify-content: center; padding: 0 0 18px; border: 0; cursor: pointer; background: linear-gradient(180deg, rgba(5, 10, 20, 0) 55%, rgba(5, 10, 20, .55)); }
+.escudo span { background: rgba(5, 10, 20, .82); color: #f2f6fb; font: 600 .9rem/1 var(--f-text); padding: 11px 18px; border-radius: 999px; border: 1px solid rgba(255, 255, 255, .25); }
+.embed.activo .escudo { display: none; }
+
+/* ---------- resultados */
+.bala { display: grid; grid-template-columns: auto 1fr auto; gap: 10px 14px; align-items: center; font-variant-numeric: tabular-nums; }
+.bala-et { font-size: .9rem; color: var(--ink-2); }
+.bala-pista { position: relative; height: 16px; border-radius: 4px; background: color-mix(in srgb, var(--ink) 8%, transparent); }
+.bala-pista i { position: absolute; left: 0; top: 0; bottom: 0; width: var(--v); background: var(--c-plan); border-radius: 4px; }
+.bala-pista::after { content: ""; position: absolute; right: 0; top: -5px; bottom: -5px; width: 2px; background: var(--ink); }
+.bala-val { font: 600 1rem/1 var(--f-mono); }
+.bala-escala { grid-column: 2; position: relative; height: 1.3em; font: 400 .72rem/1.3 var(--f-mono); color: var(--ink-3); }
+.bala-escala span { position: absolute; top: 0; transform: translateX(-50%); white-space: nowrap; }
+.bala-escala span:first-child { transform: none; }
+.bala-escala span:last-child { transform: translateX(-100%); color: var(--ink); }
+.cifras { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 220px), 1fr)); gap: 12px; }
+.cifra { padding: 14px 16px; border-radius: 12px; background: var(--panel-solid); border: 1px solid var(--line); display: grid; gap: 6px; align-content: start; }
+.cifra b { font: 700 2.2rem/1 var(--f-display); font-variant-numeric: tabular-nums; }
+.cifra span { font-size: .9rem; line-height: 1.45; color: var(--ink-2); }
+.nota { border-radius: 12px; padding: 12px 14px; display: grid; gap: 4px; background: color-mix(in srgb, var(--c, var(--ink)) 8%, var(--panel-solid)); border: 1px solid color-mix(in srgb, var(--c, var(--ink)) 32%, transparent); }
+.nota .ceja { color: var(--c, var(--ink-3)); }
+.boton {
+  font: 600 .95rem/1 var(--f-text); padding: 11px 18px; border-radius: 999px; cursor: pointer;
+  border: 1.5px solid var(--ink); background: transparent; color: var(--ink);
+}
+.boton:hover { background: color-mix(in srgb, var(--ink) 8%, transparent); }
+.boton[aria-pressed="true"] { background: var(--ink); color: var(--panel-solid); }
+.orden { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr)); gap: 18px; align-items: center; }
+
+/* ---------- magnetómetro */
+.iman-caja { display: grid; gap: 12px; align-content: start; }
+#iman { width: 100%; max-width: 460px; height: auto; display: block; justify-self: center; }
+.iman-ejes line { stroke: var(--line); stroke-width: .5; fill: none; }
+.iman-ejes text { fill: var(--ink-3); font: 400 4px var(--f-mono); }
+.iman-traza { fill: none; stroke: var(--c-sens-viva); stroke-width: .6; stroke-dasharray: 1.4 1.4; }
+#iman-puntos circle { fill: var(--c-sens-viva); opacity: .85; }
+.iman-cruz { fill: none; stroke: var(--ink-2); stroke-width: .7; }
+.iman-sensor { stroke: var(--c-sens-viva); stroke-width: 1.5; stroke-linecap: round; fill: none; }
+.iman-verdad { stroke: var(--ink); stroke-width: 1; stroke-dasharray: 2.6 1.8; fill: none; }
+.iman-cp { stroke: var(--ink-3); stroke-width: .5; stroke-dasharray: 1 1.2; fill: none; }
+.iman-arco { fill: color-mix(in srgb, var(--c-pert) 30%, transparent); stroke: var(--c-pert); stroke-width: .5; }
+.iman-origen { fill: var(--ink); }
+.iman-punto { fill: var(--c-sens-viva); stroke: var(--ink); stroke-width: .6; }
+.controles { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+.controles label { font-size: .9rem; color: var(--ink-2); display: flex; align-items: center; gap: 10px; flex: 1 1 220px; }
+.controles input[type="range"] { flex: 1; min-width: 0; accent-color: var(--c-sens); }
+.leyenda-iman { display: flex; flex-wrap: wrap; gap: 6px 16px; font-size: .84rem; color: var(--ink-2); }
+.leyenda-iman i { display: inline-block; width: 18px; height: 0; vertical-align: middle; margin-right: 6px; border-top: 2px solid; }
+.hallazgos { list-style: none; margin: 0; padding: 0; display: grid; gap: 12px; }
+.hallazgos li { padding: 12px 14px; border-radius: 12px; background: var(--panel-solid); border: 1px solid var(--line); display: grid; gap: 6px; }
+.hallazgos li p { font-size: .95rem; }
+.hallazgos li p + p { color: var(--ink-2); }
+.hallazgos li p + p::before { content: "→ "; color: var(--ink-3); }
+
+/* ---------- lo que sigue */
+.pasos { margin: 0; padding-left: 1.3em; display: grid; gap: 10px; }
+.pasos li { padding-left: 4px; }
+.pasos li::marker { font: 700 1.1rem var(--f-display); color: var(--ink-3); }
+.final { border: 1.5px solid var(--c-pert); background: color-mix(in srgb, var(--c-pert) 9%, var(--panel-solid)); border-radius: 18px; padding: clamp(20px, 3.5vw, 40px); display: grid; gap: 16px; }
+.final > * { margin: 0; min-width: 0; }
+.final-titulo { font-family: var(--f-display); font-weight: 700; text-transform: uppercase; font-size: clamp(2.6rem, 7vw, 5rem); line-height: .9; color: var(--c-pert); }
+.preguntas { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 240px), 1fr)); gap: 12px; }
+.pregunta { padding: 14px 16px; border-radius: 12px; background: var(--panel-solid); border: 1px solid var(--line); display: grid; gap: 6px; align-content: start; }
+.pregunta b { font-family: var(--f-display); font-size: 1.4rem; line-height: 1.05; }
+.pregunta span { font-size: .92rem; color: var(--ink-2); line-height: 1.45; }
+.cierre { font-size: 1.12rem; font-weight: 600; }
+
+footer { position: relative; z-index: 2; width: min(100%, 1180px); margin: 0 auto; padding-block: 24px 64px; display: grid; gap: 8px; font-size: .84rem; color: var(--ink-2); }
+footer p { max-width: 90ch; }
+footer .firmas { font: 600 .74rem/1.4 var(--f-mono); letter-spacing: .08em; text-transform: uppercase; color: var(--ink-3); }
+
+dialog#lupa { width: min(96vw, 1600px); max-width: 96vw; max-height: 92vh; padding: 0; border: 1px solid var(--line); border-radius: 14px; background: var(--panel-solid); color: var(--ink); }
+dialog#lupa::backdrop { background: rgba(4, 9, 18, .72); }
+.lupa-barra { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 10px 14px; border-bottom: 1px solid var(--line); }
+.lupa-barra p { font-size: .88rem; color: var(--ink-2); }
+.lupa-cuerpo { overflow: auto; max-height: calc(92vh - 64px); }
+.lupa-cuerpo img { display: block; width: 100%; height: auto; }
+</style>
+
+<canvas id="cielo" aria-hidden="true"></canvas>
+
+<div id="etiquetas" aria-hidden="true">
+  <div class="tag" data-a="cuerpo" data-s="1" style="--c: var(--c-pert)"><i></i><span>El cuerpo gira con el paracaídas</span></div>
+  <div class="tag" data-a="camara" data-s="1" data-lado="izq" style="--c: var(--c-plan)"><i></i><span>Sin control, la cámara gira con él</span></div>
+  <div class="tag" data-a="huella" data-s="1 4" style="--c: var(--c-plan)"><i></i><span>Lo que ve la cámara</span></div>
+  <div class="tag" data-a="bno" data-s="2" style="--c: var(--c-sens)"><i></i><span>BNO055 · 9 ejes</span></div>
+  <div class="tag" data-a="esp" data-s="2" data-lado="izq" style="--c: var(--c-ctrl)"><i></i><span>ESP32</span></div>
+  <div class="tag" data-a="ejeZ" data-s="2" style="--c: var(--ink-2)"><i></i><span>Z · nadir: el eje que controlamos</span></div>
+  <div class="tag" data-a="ejeX" data-s="2" style="--c: var(--ink-3)"><i></i><span>X</span></div>
+  <div class="tag" data-a="ejeY" data-s="2" style="--c: var(--ink-3)"><i></i><span>Y</span></div>
+  <div class="tag" data-a="paracaidas" data-s="3" style="--c: var(--c-pert)"><i></i><span>Recovery · perturbación</span></div>
+  <div class="tag" data-a="cuerpo" data-s="3" style="--c: var(--c-sens)"><i></i><span>Sensores y ESP32, adentro</span></div>
+  <div class="tag" data-a="servo" data-s="3" data-lado="izq" style="--c: var(--c-act)"><i></i><span>Actuador · servo</span></div>
+  <div class="tag" data-a="camara" data-s="3" style="--c: var(--c-plan)"><i></i><span>Planta · motor y cámara</span></div>
+  <div class="tag" data-a="flecha" data-s="3 4" style="--c: var(--c-ref)"><i></i><span>Referencia · rumbo pedido</span></div>
+  <div class="tag" data-a="bno" data-s="5" style="--c: var(--c-sens)"><i></i><span>Magnetómetro del BNO055</span></div>
+  <div class="tag" data-a="dron" data-s="6" style="--c: var(--ink-2)"><i></i><span>Dron: suelta el PocketQube</span></div>
+  <div class="tag" data-a="paracaidas" data-s="6" style="--c: var(--c-pert)"><i></i><span>Paracaídas real del recovery</span></div>
+  <div class="tag" data-a="cuerpo" data-s="6" style="--c: var(--c-pert)"><i></i><span>¿Cuánto gira de verdad?</span></div>
+</div>
+
+<div class="progreso" aria-hidden="true"><span></span></div>
+
+<nav class="riel" aria-label="Diapositivas">
+  <ol>
+    <li><a href="#portada"><span class="nom">1 · Portada</span><span class="marca"></span></a></li>
+    <li><a href="#reto"><span class="nom">2 · El reto</span><span class="marca"></span></a></li>
+    <li><a href="#hardware"><span class="nom">3 · Hardware</span><span class="marca"></span></a></li>
+    <li><a href="#control"><span class="nom">4 · Control</span><span class="marca"></span></a></li>
+    <li><a href="#resultados"><span class="nom">5 · Resultados</span><span class="marca"></span></a></li>
+    <li><a href="#sensor"><span class="nom">6 · Sensor real</span><span class="marca"></span></a></li>
+    <li><a href="#siguiente"><span class="nom">7 · Lo que sigue</span><span class="marca"></span></a></li>
+  </ol>
+</nav>
+
+<main>
+
+  <!-- 1 · Portada -->
+  <section class="slide slide--hero" id="portada" aria-label="Portada">
+    <div class="hero">
+      <p class="ceja"><b>1 / 7</b> CanSat 2027 · PocketQube · cámara</p>
+      <h1>Que el suelo no gire</h1>
+      <div class="hero-cuerpo">
+      <p class="lead">El PocketQube baja colgado de un paracaídas, y el paracaídas lo hace girar. Su cámara tiene que grabar el suelo sin que la imagen dé vueltas. Así lo estamos resolviendo: un sensor que siente el giro y un control que lo corrige.</p>
+      <div class="autores">
+        <div class="autor"><i class="franja calida" aria-hidden="true"></i><b>Luis Edmundo Parra</b><span>Hardware: sensor BNO055, ESP32 y pruebas en banco</span></div>
+        <div class="autor"><i class="franja fria" aria-hidden="true"></i><b>Angel Fernando Revelo Narvaez</b><span>Control: modelo, controlador y simulación en Simulink</span></div>
+      </div>
+      <p class="peque">Un mismo lazo con dos mitades: el hardware que mide y el software que corrige. Noviembre de 2026.</p>
+      <p class="baja"><svg viewBox="0 0 14 14" aria-hidden="true"><path d="M2 5l5 5 5-5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>Baja para seguir el descenso</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 2 · El reto -->
+  <section class="slide" id="reto" aria-labelledby="t-reto">
+    <div class="panel">
+      <p class="ceja"><b>2 / 7</b> El reto</p>
+      <h2 id="t-reto">La cámara mira al suelo mientras todo gira</h2>
+      <p>Bajo el paracaídas el cuerpo no se queda quieto: las cuerdas y la tela del recovery lo hacen oscilar y girar. Si la cámara va pegada al cuerpo, el suelo da vueltas en el video.</p>
+      <div class="guia" lang="en">
+        <p><b>C8</b>The PocketQube shall record video in the nadir direction with less than +/- 10 degrees rotation in the video.</p>
+        <p><b>PQ15</b>The video of the ground shall be stabilized so the ground does not rotate during the flight.</p>
+        <p><b>C11</b>The PocketQube shall rotate the video along the nadir axis at the specified angle on command.</p>
+        <p class="peque" lang="es">Guía de misión CanSat 2027 r1.1, p. 9 y 14. En simple: menos de ±10° de giro en el video, con la imagen apuntando al norte (p. 25), y a los 30 s de vuelo, cuando el juez lo ordene, girar la vista 90° (p. 6).</p>
+      </div>
+    </div>
+    <div class="band">
+      <div class="dos">
+        <div class="pila">
+          <p class="ilus">Lo que vería la cámara · ilustración</p>
+          <div class="visores">
+            <div class="visor" data-visor="libre">
+              <div class="visor-cab"><b>Sin control</b><span>la cámara gira con el cuerpo</span></div>
+              <canvas width="400" height="300" role="img" aria-label="Ilustración: sin control, la imagen del suelo da vueltas."></canvas>
+              <div class="medidor" aria-hidden="true">
+                <div class="pista"><i></i></div>
+                <div class="escala"><span style="left:0">−30°</span><span style="left:33.33%">−10°</span><span style="left:50%">0°</span><span style="left:66.67%">+10°</span><span style="left:100%">+30°</span></div>
+              </div>
+              <p class="lectura">Giro del suelo en el video: <output data-out>0°</output></p>
+            </div>
+            <div class="visor" data-visor="control">
+              <div class="visor-cab"><b>Con control</b><span>el servo gira la cámara al revés</span></div>
+              <canvas width="400" height="300" role="img" aria-label="Ilustración: con control, la imagen del suelo casi no gira y la flecha verde sigue apuntando hacia arriba."></canvas>
+              <div class="medidor" aria-hidden="true">
+                <div class="pista"><i></i></div>
+                <div class="escala"><span style="left:0">−30°</span><span style="left:33.33%">−10°</span><span style="left:50%">0°</span><span style="left:66.67%">+10°</span><span style="left:100%">+30°</span></div>
+              </div>
+              <p class="lectura">Giro del suelo en el video: <output data-out>0°</output></p>
+            </div>
+          </div>
+          <p class="peque">La flecha verde es el rumbo pedido. La franja verde del medidor es el margen de C8 (±10°). El giro de juguete de esta ilustración no es un resultado; los resultados están en la diapositiva 5.</p>
+        </div>
+        <div class="pila">
+          <h3>La idea: girar solo la cámara</h3>
+          <p>Un servomotor gira la cámara al revés que el cuerpo, como una gallina que mantiene la cabeza quieta aunque mueva el cuerpo.</p>
+          <p>Basta un eje: el que mira al suelo (Z, nadir). Los otros dos no se controlan. Colgado del paracaídas, el PocketQube se porta como un péndulo y la gravedad lo deja mirando hacia abajo.</p>
+          <p>Esa inclinación sí la medimos con el mismo sensor: la necesitamos para corregir la brújula, y la telemetría pide giro, aceleración y campo magnético en los tres ejes (p. 26).</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 3 · Hardware -->
+  <section class="slide" id="hardware" aria-labelledby="t-hw">
+    <div class="panel">
+      <p class="ceja"><b>3 / 7</b> El hardware</p>
+      <h2 id="t-hw">Los ojos del sistema: BNO055 y ESP32</h2>
+      <p>El BNO055 es un sensor de 9 grados de libertad: acelerómetro, giróscopo y magnetómetro, cada uno en 3 ejes. El giróscopo siente qué tan rápido gira el cuerpo, el magnetómetro dónde está el norte y el acelerómetro dónde está abajo.</p>
+      <p>Luis lo conectó a un ESP32 y escribió tres programas en PlatformIO, uno por prueba: magnetómetro, acelerómetro y orientación con la fusión interna del sensor (modo NDOF). Tres scripts de MATLAB reciben los datos por el puerto serie y los grafican en vivo.</p>
+      <div class="tubo" aria-label="Cadena de la prueba: BNO055, ESP32, MATLAB">
+        <div class="nodo" style="--sw: var(--s-sens); --c: var(--c-sens)"><b>BNO055</b><span>9 ejes · I²C, dirección 0x29</span></div>
+        <div class="flechita">I²C</div>
+        <div class="nodo" style="--sw: var(--s-ctrl); --c: var(--c-ctrl)"><b>ESP32</b><span>lee cada 50 ms (20 Hz); aquí correrá el control</span></div>
+        <div class="flechita">serie</div>
+        <div class="nodo" style="--sw: var(--s-med); --c: var(--c-med)"><b>MATLAB</b><span>gráficas en vivo y CSV · 115 200 baudios</span></div>
+      </div>
+      <p class="peque">Primera lectura del sensor real, el 10 de noviembre de 2026, sin calibrar a propósito: la meta era ver que respondiera y cómo se comporta en crudo (TST-003).</p>
+    </div>
+    <div class="band">
+      <div class="galeria">
+        <figure class="fig">
+          <button class="fig-btn" type="button" data-lupa="img/tst-003-magnetometro.png" aria-label="Ampliar la captura del magnetómetro"><img src="img/tst-003-magnetometro.png" width="1366" height="768" loading="lazy" alt="Captura de MATLAB con el campo magnético en los tres ejes, el círculo mx contra my y el rumbo sin calibrar."></button>
+          <figcaption><b>Magnetómetro.</b> El campo en los 3 ejes, el círculo que dibujan mx y my al girar el sensor plano, y el rumbo sin calibrar.</figcaption>
+        </figure>
+        <figure class="fig">
+          <button class="fig-btn" type="button" data-lupa="img/tst-003-acelerometro.png" aria-label="Ampliar la captura del acelerómetro"><img src="img/tst-003-acelerometro.png" width="1366" height="768" loading="lazy" alt="Captura de MATLAB con la aceleración en los tres ejes y su magnitud: quieto marca casi 9,8 m/s² y moviéndolo a mano oscila."></button>
+          <figcaption><b>Acelerómetro.</b> Quieto marca casi g; movido a mano, la magnitud sube y baja.</figcaption>
+        </figure>
+        <figure class="fig">
+          <button class="fig-btn" type="button" data-lupa="img/tst-003-orientacion-ndof.png" aria-label="Ampliar la captura de orientación NDOF"><img src="img/tst-003-orientacion-ndof.png" width="1366" height="768" loading="lazy" alt="Captura de MATLAB con yaw, roll y pitch de la fusión NDOF y el estado de calibración de cada sensor."></button>
+          <figcaption><b>Orientación (NDOF).</b> Yaw, roll y pitch de la fusión interna, y el estado de calibración de cada sensor, de 0 a 3.</figcaption>
+        </figure>
+      </div>
+      <p class="peque">Capturas de Luis Edmundo Parra, 10 de noviembre de 2026. Toca una imagen para ampliarla.</p>
+    </div>
+  </section>
+
+  <!-- 4 · Control -->
+  <section class="slide" id="control" aria-labelledby="t-ctrl">
+    <div class="panel">
+      <p class="ceja"><b>4 / 7</b> El control</p>
+      <h2 id="t-ctrl">Nueve colores, un lazo</h2>
+      <p>Un lazo de control (control loop) repite tres pasos, 100 veces por segundo: medir, comparar y corregir. En el modelo de Simulink cada bloque lleva el color de su papel, así el diagrama se puede leer sin saber control.</p>
+      <div class="regla" aria-label="La regla de color">
+        <h3>La regla de color</h3>
+        <div class="regla-fila"><span class="tiras" aria-hidden="true"><i style="--sw: var(--s-pert)"></i><i style="--sw: var(--s-sens)"></i><i style="--sw: var(--s-act)"></i><i style="--sw: var(--s-plan)"></i></span><p><b>Cálidos: el mundo físico.</b> Lo que estorba, lo que mide, lo que empuja y lo que se mueve.</p></div>
+        <div class="regla-fila"><span class="tiras" aria-hidden="true"><i style="--sw: var(--s-est)"></i><i style="--sw: var(--s-ctrl)"></i><i style="--sw: var(--s-ff)"></i></span><p><b>Fríos: el software dentro del ESP32.</b> Lo que cree, lo que decide y lo que anticipa.</p></div>
+        <div class="regla-fila"><span class="tiras" aria-hidden="true"><i style="--sw: var(--s-ref)"></i><i style="--sw: var(--s-med)"></i></span><p><b>Verde: lo que queremos. Gris: lo que solo miramos</b> en el computador.</p></div>
+      </div>
+    </div>
+    <div class="band">
+      <div class="grupos">
+        <div class="grupo">
+          <p class="grupo-tit">Mundo físico · cálidos</p>
+          <div class="chip" style="--sw: var(--s-pert); --c: var(--c-pert)"><i class="muestra" aria-hidden="true"></i><b>Rojo · Perturbación</b><span>El giro del cuerpo que provoca el recovery. Es lo que estorba.</span></div>
+          <div class="chip" style="--sw: var(--s-sens); --c: var(--c-sens)"><i class="muestra" aria-hidden="true"></i><b>Amarillo · Sensores</b><span>Giróscopo y magnetómetro del BNO055, y el codificador que mide el ángulo del motor.</span></div>
+          <div class="chip" style="--sw: var(--s-act); --c: var(--c-act)"><i class="muestra" aria-hidden="true"></i><b>Naranja · Actuador</b><span>El driver (puente H) que entrega al motor hasta ±6 V.</span></div>
+          <div class="chip" style="--sw: var(--s-plan); --c: var(--c-plan)"><i class="muestra" aria-hidden="true"></i><b>Magenta · Planta</b><span>El motor con la cámara: lo que de verdad se mueve.</span></div>
+        </div>
+        <div class="grupo">
+          <p class="grupo-tit">Software en el ESP32 · fríos</p>
+          <div class="chip" style="--sw: var(--s-est); --c: var(--c-est)"><i class="muestra" aria-hidden="true"></i><b>Violeta · Estimador</b><span>Junta giróscopo y magnetómetro y calcula hacia dónde mira la cámara (filtro complementario).</span></div>
+          <div class="chip" style="--sw: var(--s-ctrl); --c: var(--c-ctrl)"><i class="muestra" aria-hidden="true"></i><b>Azul · Controlador</b><span>Compara lo que queremos con lo que creemos y decide cuánto corregir (RST con integrador).</span></div>
+          <div class="chip" style="--sw: var(--s-ff); --c: var(--c-ff)"><i class="muestra" aria-hidden="true"></i><b>Cian · Prealimentación</b><span>Si el cuerpo gira, manda de una vez el giro contrario, sin esperar a que aparezca el error (feedforward).</span></div>
+          <p class="grupo-tit">Lo que queremos y lo que miramos</p>
+          <div class="chip" style="--sw: var(--s-ref); --c: var(--c-ref)"><i class="muestra" aria-hidden="true"></i><b>Verde · Referencia</b><span>El rumbo de la cámara: 0°, y 90° cuando tierra lo ordena.</span></div>
+          <div class="chip" style="--sw: var(--s-med); --c: var(--c-med)"><i class="muestra" aria-hidden="true"></i><b>Gris · Medición</b><span>Osciloscopios con el error y el voltaje. Solo existen en la simulación.</span></div>
+        </div>
+      </div>
+      <p class="peque">Las muestras son los mismos colores de los bloques en Simulink.</p>
+
+      <div class="pila">
+        <h3>Una vuelta del lazo</h3>
+        <ol class="vuelta">
+          <li style="--sw: var(--s-ref); --c: var(--c-ref)"><span class="tira" aria-hidden="true"></span>Pedimos un rumbo.</li>
+          <li style="--sw: var(--s-sens); --c: var(--c-sens)"><span class="tira" aria-hidden="true"></span>Los sensores miden el giro del cuerpo y el norte.</li>
+          <li style="--sw: var(--s-est); --c: var(--c-est)"><span class="tira" aria-hidden="true"></span>El estimador calcula hacia dónde mira la cámara.</li>
+          <li style="--sw: var(--s-ctrl); --c: var(--c-ctrl)"><span class="tira" aria-hidden="true"></span>El controlador compara y decide cuánto corregir.</li>
+          <li style="--sw: var(--s-ff); --c: var(--c-ff)"><span class="tira" aria-hidden="true"></span>La prealimentación suma el giro contrario al del cuerpo.</li>
+          <li style="--sw: var(--s-act); --c: var(--c-act)"><span class="tira" aria-hidden="true"></span>El driver mueve el motor y el motor gira la cámara.</li>
+          <li style="--sw: var(--s-pert); --c: var(--c-pert)"><span class="tira" aria-hidden="true"></span>El recovery vuelve a girar el cuerpo, y el lazo empieza otra vez.</li>
+        </ol>
+      </div>
+
+      <div class="pila">
+        <h3>El mismo lazo, para explorarlo</h3>
+        <div class="embed">
+          <iframe src="lazo-camara-colores.html" title="Diagrama interactivo del lazo de la cámara en Simulink, por colores" loading="lazy"></iframe>
+          <button class="escudo" type="button"><span>Toca para explorar el diagrama</span></button>
+        </div>
+        <p class="peque">Diagrama hecho con archify a partir del script del modelo. Usa su propia paleta: el controlador y la prealimentación comparten el cian, y el servo y la cámara comparten el naranja. <a href="lazo-camara-colores.html" target="_blank" rel="noopener">Abrir el diagrama en otra pestaña</a>.</p>
+      </div>
+
+      <figure class="fig">
+        <button class="fig-btn" type="button" data-lupa="img/simulink-modelo.png" aria-label="Ampliar la captura del modelo de Simulink"><img src="img/simulink-modelo.png" width="1920" height="1080" loading="lazy" alt="Captura del modelo de Simulink del lazo de la cámara con bloques de colores: referencia verde, perturbación roja, sensores amarillos, estimador violeta, controlador azul, prealimentación cian, actuador naranja, planta magenta y medición gris."></button>
+        <figcaption><b>Así se ve en Simulink.</b> El modelo del lazo con un color por función, captura del 11 de noviembre de 2026. La leyenda está abajo a la izquierda.</figcaption>
+      </figure>
+    </div>
+  </section>
+
+  <!-- 5 · Resultados -->
+  <section class="slide" id="resultados" aria-labelledby="t-res">
+    <div class="panel">
+      <p class="ceja"><b>5 / 7</b> Resultados en simulación</p>
+      <h2 id="t-res">En Simulink, el suelo gira menos de 3°</h2>
+      <p>Simulamos dos maneras de girar del cuerpo, supuestas por nosotros: en S1 el cuerpo oscila sin dar vueltas; en S2 gira cada vez más rápido, hasta 90 °/s.</p>
+      <div class="bala" role="img" aria-label="Giro máximo del suelo en el video: 3,01° en S1 y 2,60° en S2, frente al límite de 10° de C8.">
+        <span class="bala-et">S1 · oscila</span><span class="bala-pista"><i style="--v: 30.1%"></i></span><span class="bala-val">3,01°</span>
+        <span class="bala-et">S2 · gira</span><span class="bala-pista"><i style="--v: 26.0%"></i></span><span class="bala-val">2,60°</span>
+        <span class="bala-escala" aria-hidden="true"><span style="left:0">0°</span><span style="left:50%">5°</span><span style="left:100%">10° · límite C8</span></span>
+      </div>
+      <p>El peor momento usa menos de un tercio del margen que da la guía.</p>
+    </div>
+    <div class="band">
+      <div class="cifras">
+        <div class="cifra"><b>0,28° y 0,19°</b><span>Error del control solo, en S1 y S2: cuánto se aleja la cámara de lo que el ESP32 cree.</span></div>
+        <div class="cifra"><b>0,15 V</b><span>Voltaje máximo que pidió al motor (S1), de ±6 V disponibles. En S2, 0,12 V.</span></div>
+        <div class="cifra"><b>3,06° y 2,55°</b><span>Los mismos casos calculados en Python. Las dos herramientas coinciden.</span></div>
+      </div>
+      <div class="dos">
+        <div class="pila">
+          <h3>Dos errores distintos</h3>
+          <p>El <b>error real</b> es lo que vería el juez: cuánto gira el suelo en el video. El <b>error del control</b> es cuánto se aleja la cámara de lo que el ESP32 cree.</p>
+          <p>El control casi no se equivoca. Casi todo el error real viene de no saber con exactitud dónde está el norte. Por eso lo siguiente es el sensor.</p>
+        </div>
+        <div class="pila">
+          <h3>¿Y el pico a los 30 s?</h3>
+          <p>Es el giro de 90° que ordena tierra (C11). Durante ese segundo la cámara va un poco detrás de la orden y luego se acomoda. Las métricas no cuentan ese tramo ni los primeros 5 s, que son el arranque.</p>
+        </div>
+      </div>
+      <figure class="fig">
+        <button class="fig-btn" type="button" data-lupa="img/simulink-error-s1-s2.png" aria-label="Ampliar la figura del error en S1 y S2"><img src="img/simulink-error-s1-s2.png" width="1920" height="1080" loading="lazy" alt="Dos gráficas del error de la cámara de 0 a 60 s, para S1 y S2. El error real se queda entre 0 y −3° y el error del control cerca de 0°, salvo un pico a los 30 s por el giro de 90°."></button>
+        <figcaption><b>Error de la cámara en S1 (arriba) y S2 (abajo).</b> Azul: error real. Naranja: error del control. Las líneas punteadas son el límite de C8 (±10°).</figcaption>
+      </figure>
+      <div class="galeria">
+        <figure class="fig">
+          <button class="fig-btn" type="button" data-lupa="img/simulink-osciloscopio-voltaje.png" aria-label="Ampliar el osciloscopio del voltaje"><img src="img/simulink-osciloscopio-voltaje.png" width="1600" height="900" loading="lazy" alt="Osciloscopio del voltaje al motor en S2: se queda cerca de 0 V, muy lejos de los ±6 V disponibles."></button>
+          <figcaption><b>Voltaje al motor (S2).</b> Se mueve cerca de 0 V; el driver podría dar hasta ±6 V.</figcaption>
+        </figure>
+        <figure class="fig">
+          <button class="fig-btn" type="button" data-lupa="img/simulink-osciloscopio-error.png" aria-label="Ampliar el osciloscopio del error"><img src="img/simulink-osciloscopio-error.png" width="1600" height="900" loading="lazy" alt="Osciloscopio del error en S2: el error real en amarillo oscila por debajo de 0° y el error del control en azul se queda en 0°, con un pico a los 30 s."></button>
+          <figcaption><b>Error en el osciloscopio (S2).</b> Amarillo: error real. Azul: error del control.</figcaption>
+        </figure>
+      </div>
+      <div class="orden">
+        <div class="visor" data-visor="orden">
+          <div class="visor-cab"><b>La orden de tierra</b><span>ilustración del giro de 90°</span></div>
+          <canvas width="400" height="300" role="img" aria-label="Ilustración: al pedir el giro, la imagen del suelo rota 90° de forma suave."></canvas>
+          <div class="medidor" aria-hidden="true">
+            <div class="pista"><i></i></div>
+            <div class="escala"><span style="left:0">−30°</span><span style="left:33.33%">−10°</span><span style="left:50%">0°</span><span style="left:66.67%">+10°</span><span style="left:100%">+30°</span></div>
+          </div>
+          <p class="lectura">Rumbo pedido: <output data-out2>0°</output> · la cámara respecto a lo pedido: <output data-out>0°</output></p>
+        </div>
+        <div class="pila">
+          <h3>Pruébalo</h3>
+          <p>El botón hace lo que hará el juez a los 30 s de vuelo. La referencia gira 90° en un segundo, como en la simulación, y la cámara la sigue. En la escena 3D también gira la flecha verde.</p>
+          <p><button class="boton" type="button" id="pedir-giro">Pedir giro de 90°</button></p>
+        </div>
+      </div>
+      <div class="nota" style="--c: var(--c-act)">
+        <p class="ceja">Con qué se simuló</p>
+        <p>Un motor con ganancia de 30 rad/s por voltio y constante de tiempo de 0,1 s, y el cuerpo girando como en S1 y S2.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 6 · Sensor real -->
+  <section class="slide" id="sensor" aria-labelledby="t-sen">
+    <div class="panel">
+      <p class="ceja"><b>6 / 7</b> Lo que dijo el sensor real</p>
+      <h2 id="t-sen">Sin calibrar, el norte se corre unos 20°</h2>
+      <p>Si el sensor gira plano, sus lecturas dibujan un círculo. Con el círculo centrado, el ángulo de cada punto es el rumbo. En la prueba de Luis el círculo quedó corrido unos 10 µT, con un radio de unos 28 µT.</p>
+      <p>Ese corrimiento lo causan imanes, tornillos y corrientes cerca del sensor (hierro duro, hard iron). Tuerce el rumbo hasta unos 20°, el doble de lo que permite C8. Calibrar es medir el corrimiento y restarlo. La guía, además, pide enviar el magnetómetro ya calibrado (PQ30).</p>
+    </div>
+    <div class="band">
+      <div class="dos">
+        <div class="iman-caja">
+          <svg id="iman" viewBox="-66 -62 132 124" role="img" aria-labelledby="iman-t iman-d">
+            <title id="iman-t">Círculo de lecturas del magnetómetro</title>
+            <desc id="iman-d">Al girar el sensor plano, sus lecturas dibujan un círculo. Si el círculo no está centrado en el origen, el ángulo leído se aleja del rumbo verdadero.</desc>
+            <g class="iman-ejes">
+              <line x1="-60" y1="0" x2="60" y2="0"></line>
+              <line x1="0" y1="-58" x2="0" y2="58"></line>
+              <line x1="-50" y1="-1.5" x2="-50" y2="1.5"></line><line x1="50" y1="-1.5" x2="50" y2="1.5"></line>
+              <line x1="-1.5" y1="-50" x2="1.5" y2="-50"></line><line x1="-1.5" y1="50" x2="1.5" y2="50"></line>
+              <text x="-50" y="7" text-anchor="middle">−50</text><text x="50" y="7" text-anchor="middle">50</text>
+              <text x="-3" y="-48.8" text-anchor="end">50</text><text x="-3" y="51.2" text-anchor="end">−50</text>
+              <text x="60" y="-3" text-anchor="end">mx (µT)</text>
+              <text x="3" y="-55">my (µT)</text>
+            </g>
+            <path id="iman-arco" class="iman-arco" d=""></path>
+            <g id="iman-circulo" transform="translate(4 9)">
+              <circle class="iman-traza" cx="0" cy="0" r="28"></circle>
+              <g id="iman-puntos"></g>
+              <path class="iman-cruz" d="M-2.5 0H2.5M0 -2.5V2.5"></path>
+            </g>
+            <line id="iman-cp" class="iman-cp" x1="0" y1="0" x2="0" y2="0"></line>
+            <line id="iman-verdad" class="iman-verdad" x1="0" y1="0" x2="0" y2="0"></line>
+            <line id="iman-sensor" class="iman-sensor" x1="0" y1="0" x2="0" y2="0"></line>
+            <circle class="iman-origen" cx="0" cy="0" r="1.5"></circle>
+            <circle id="iman-punto" class="iman-punto" cx="0" cy="0" r="2.6"></circle>
+          </svg>
+          <div class="leyenda-iman">
+            <span><i style="border-color: var(--c-sens-viva)"></i>lo que dice el sensor</span>
+            <span><i style="border-color: var(--ink); border-top-style: dashed"></i>rumbo verdadero</span>
+            <span><i style="border-color: var(--c-pert)"></i>el error</span>
+          </div>
+          <div class="controles">
+            <button class="boton" type="button" id="iman-sin" data-cal="no" aria-pressed="true">Sin calibrar</button>
+            <button class="boton" type="button" id="iman-con" data-cal="si" aria-pressed="false">Calibrado</button>
+            <label for="iman-giro">Gira el sensor <input type="range" id="iman-giro" min="0" max="359" step="1" value="40"></label>
+          </div>
+          <p class="lectura">Error de rumbo en este punto: <output id="iman-error">0°</output> · máximo sin calibrar ≈ 20°</p>
+          <p class="peque">Círculo dibujado con la lectura a ojo de la captura de Luis: centro ≈ (+4, −9) µT y radio ≈ 28 µT.</p>
+        </div>
+        <div class="pila">
+          <h3>Lo demás que vimos</h3>
+          <ul class="hallazgos">
+            <li><p>El campo medido (≈ 52 µT) casi dobla el de la Tierra en Bogotá (≈ 30 µT), y la diferencia está en el eje vertical.</p><p>Calibrar en 3D, no solo girando plano, y con el montaje final.</p></li>
+            <li><p>Quieto, el acelerómetro marca casi g (≈ 9,5 m/s²). Movido a mano, va de ≈ 4 a ≈ 17 m/s².</p><p>En movimiento no sirve para saber dónde es abajo: la inclinación sale de un filtro con el giróscopo.</p></li>
+            <li><p>La calibración automática (NDOF) necesitó mover el sensor, el acelerómetro nunca quedó calibrado y el rumbo saltó entre 0° y 360°.</p><p>En vuelo no hay tiempo de calibrar: el PocketQube va apagado en el contenedor (PQ21). Las constantes van guardadas en el firmware.</p></li>
+            <li><p>Se leyó a 20 Hz.</p><p>Sirve para mirar. El control necesita 100 Hz: a 20 Hz, con el cuerpo a 90 °/s, el retraso costaría ≈ 4,5°, frente a ≈ 0,9° a 100 Hz.</p></li>
+          </ul>
+          <div class="nota" style="--c: var(--c-est)">
+            <p class="ceja">¿Cambia el controlador?</p>
+            <p>No. Cambia lo que lo rodea: calibrar el magnetómetro pasa a ser lo más urgente (riesgo RSK-002, alto).</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 7 · Lo que sigue -->
+  <section class="slide" id="siguiente" aria-labelledby="t-sig">
+    <div class="panel">
+      <p class="ceja"><b>7 / 7</b> Lo que sigue</p>
+      <h2 id="t-sig">Un filtro para el sensor y una prueba con el recovery</h2>
+      <h3>En banco: seguir con el sensor</h3>
+      <ol class="pasos">
+        <li><b>Meterle un filtro al sensor y probarlo.</b> Primero el filtro complementario que ya está en el modelo (el bloque violeta), corriendo en el ESP32. Junta el giróscopo, rápido pero que se desvía con el tiempo, con el magnetómetro, lento y ruidoso pero que no se desvía. Lo probamos girando el sensor con el motor, con el codificador como referencia, y lo comparamos con la fusión interna del BNO055. Si no alcanza, evaluamos un filtro de Kalman.</li>
+        <li><b>Calibrar el magnetómetro en 3D</b> con el montaje final (servo, batería y brazo en su sitio) y guardar las constantes en el firmware.</li>
+        <li><b>Registrar a 100 Hz</b>, en crudo y en CSV, con el giróscopo y el LIS3MDL del brazo (guía TST-002).</li>
+        <li><b>Medir el motor en banco</b> para cambiar los supuestos de la simulación.</li>
+      </ol>
+    </div>
+    <div class="band">
+      <div class="final">
+        <p class="ceja">Lo indispensable</p>
+        <h3 class="final-titulo">Probar con el recovery</h3>
+        <p class="lead">Todo lo anterior pasó en el computador o sobre la mesa. El giro del cuerpo bajo el paracaídas, el rojo del lazo, lo supusimos: nadie lo ha medido.</p>
+        <p>La prueba: soltar el PocketQube desde un dron con el paracaídas real, registrar el BNO055 a 100 Hz y grabar con la cámara. Responde tres preguntas:</p>
+        <div class="preguntas">
+          <div class="pregunta"><b>¿Cuánto gira de verdad?</b><span>Cambia los escenarios supuestos S1 y S2 por datos.</span></div>
+          <div class="pregunta"><b>¿Gira seguido o solo oscila?</b><span>Decide el actuador: un servo de 180° alcanza solo si no hay giro continuo; si no, hace falta un motor de vuelta completa.</span></div>
+          <div class="pregunta"><b>¿Cuánto se balancea?</b><span>Si es mucho, habrá que pensar en controlar un segundo eje (cardán).</span></div>
+        </div>
+        <p class="cierre">Sin esta prueba, el control solo está probado en simulación. Del recovery necesitamos el paracaídas y las cuerdas finales, o unos equivalentes, y una fecha para la prueba.</p>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  <p><b>De dónde salen los números.</b> Del brain del equipo: TST-003 (capturas de Luis, 10 de noviembre de 2026); el script <span class="mono">sim/simulink_lazo_camara_l3.m</span> y sus métricas en <span class="mono">derivados/simulink-lazo-camara-l3-metricas.csv</span>; las secciones 9 y 10 de <span class="mono">Control/diseno-estabilizacion-camara.md</span>; los riesgos RSK-001 y RSK-002, y la guía de misión CanSat 2027 r1.1 (p. 6, 9, 14, 25 y 26). Las animaciones son ilustraciones; los números salen de los scripts.</p>
+  <p class="firmas">Luis Edmundo Parra · Angel Fernando Revelo Narvaez · noviembre de 2026</p>
+</footer>
+
+<dialog id="lupa" aria-label="Imagen ampliada">
+  <div class="lupa-barra"><p></p><button class="boton" type="button" id="lupa-cerrar">Cerrar</button></div>
+  <div class="lupa-cuerpo"><img src="" alt=""></div>
+</dialog>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+(() => {
+  'use strict';
+  document.documentElement.lang = 'es';
+  const D2R = Math.PI / 180;
+  const mqMov = window.matchMedia('(prefers-reduced-motion: reduce)');
+  let reduce = mqMov.matches;
+  if (mqMov.addEventListener) mqMov.addEventListener('change', e => { reduce = e.matches; });
+  const wrapPi = a => Math.atan2(Math.sin(a), Math.cos(a));
+  const suave = t => (t <= 0 ? 0 : t >= 1 ? 1 : t * t * (3 - 2 * t));
+  const mezcla = (a, b, t) => a + (b - a) * t;
+  const grados = (x, signo) => {
+    const n = Math.round(x);
+    return (signo && n > 0 ? '+' : '') + String(n).replace('-', '−') + '°';
+  };
+
+  /* ---------- referencia compartida (C11): giro suave en 1 s, como en el script */
+  const ref = { de: 0, a: 0, t0: -10, valor: 0 };
+  function actualizarRef(ahora) {
+    const s = Math.min(Math.max(ahora - ref.t0, 0), 1);
+    ref.valor = ref.de + (ref.a - ref.de) * (0.5 - 0.5 * Math.cos(Math.PI * s));
+  }
+  function pedirGiro(objetivo) { ref.de = ref.valor; ref.a = objetivo; ref.t0 = performance.now() / 1000; }
+
+  /* ---------- suelo: una textura que se repite sin costuras, compartida por la escena y los visores */
+  function semilla(n) { let s = n >>> 0; return () => (s = (Math.imul(s, 1664525) + 1013904223) >>> 0) / 4294967296; }
+  const suelo = (() => {
+    const S = 1024, c = document.createElement('canvas');
+    c.width = c.height = S;
+    const g = c.getContext('2d'), r = semilla(11);
+    g.fillStyle = '#8a9a62'; g.fillRect(0, 0, S, S);
+    const pal = ['#93a565', '#a7ab6f', '#73904f', '#bca874', '#869a5d', '#c6b784', '#62804a', '#9fb273', '#ad9d66', '#7f9658'];
+    const N = 8, cel = S / N;
+    for (let i = 0; i < N; i++) for (let j = 0; j < N; j++) {
+      const k = 1 + Math.floor(r() * 3), vert = r() < 0.5;
+      for (let m = 0; m < k; m++) {
+        g.fillStyle = pal[Math.floor(r() * pal.length)];
+        if (vert) g.fillRect(i * cel + m * cel / k, j * cel, cel / k + 1, cel + 1);
+        else g.fillRect(i * cel, j * cel + m * cel / k, cel + 1, cel / k + 1);
+      }
+      if (r() < 0.55) {
+        g.save(); g.globalAlpha = 0.1; g.strokeStyle = '#2f3b20'; g.lineWidth = 2;
+        const v = r() < 0.5;
+        for (let q = 6; q < cel; q += 9) {
+          g.beginPath();
+          if (v) { g.moveTo(i * cel + q, j * cel); g.lineTo(i * cel + q, j * cel + cel); }
+          else { g.moveTo(i * cel, j * cel + q); g.lineTo(i * cel + cel, j * cel + q); }
+          g.stroke();
+        }
+        g.restore();
+      }
+    }
+    g.strokeStyle = 'rgba(40, 52, 28, 0.35)'; g.lineWidth = 3;
+    for (let i = 0; i <= N; i++) {
+      g.beginPath(); g.moveTo(i * cel, 0); g.lineTo(i * cel, S); g.stroke();
+      g.beginPath(); g.moveTo(0, i * cel); g.lineTo(S, i * cel); g.stroke();
+    }
+    g.lineCap = 'round'; g.lineJoin = 'round';
+    const rio = () => { g.beginPath(); g.moveTo(-30, 380); g.bezierCurveTo(200, 380, 260, 600, 520, 560); g.bezierCurveTo(760, 520, 800, 380, 1054, 380); };
+    g.strokeStyle = '#5d7f62'; g.lineWidth = 46; rio(); g.stroke();
+    g.strokeStyle = '#4c7ea6'; g.lineWidth = 32; rio(); g.stroke();
+    g.strokeStyle = 'rgba(255, 255, 255, 0.2)'; g.lineWidth = 5; rio(); g.stroke();
+    g.strokeStyle = '#dcd5c3'; g.lineWidth = 12;
+    g.beginPath(); g.moveTo(-10, 860); g.lineTo(1034, 860); g.stroke();
+    g.beginPath(); g.moveTo(700, -10); g.bezierCurveTo(700, 260, 600, 420, 640, 560); g.bezierCurveTo(680, 700, 700, 800, 700, 1034); g.stroke();
+    for (let n = 0; n < 36; n++) {
+      const x = 730 + r() * 180, y = 650 + r() * 150;
+      g.fillStyle = r() < 0.5 ? '#cfc8ba' : '#b5654a';
+      g.fillRect(x, y, 10 + r() * 14, 8 + r() * 12);
+    }
+    return c;
+  })();
+
+  /* ---------- posición en el recorrido */
+  const diapos = [...document.querySelectorAll('.slide')];
+  let cajas = [];
+  function medir() {
+    cajas = diapos.map(d => { const r = d.getBoundingClientRect(); return { top: r.top + window.scrollY, h: Math.max(r.height, 1) }; });
+  }
+  function posicion() {
+    const vh = window.innerHeight, c = window.scrollY + vh * 0.5, w = vh * 0.3;
+    let i = 0;
+    for (let k = 0; k < cajas.length; k++) if (c >= cajas[k].top) i = k;
+    const caja = cajas[i] || { top: 0, h: 1 };
+    const fin = caja.top + caja.h;
+    let b = i;
+    if (i < cajas.length - 1 && c > fin - w) b = i + suave((c - (fin - w)) / (2 * w));
+    else if (i > 0 && c < caja.top + w) b = i - 1 + suave((c - (caja.top - w)) / (2 * w));
+    const p = Math.min(Math.max((c - caja.top) / caja.h, 0), 1);
+    return { b, i, p };
+  }
+
+  /* ---------- navegación y barra */
+  const enlaces = [...document.querySelectorAll('.riel a')];
+  const barra = document.querySelector('.progreso span');
+  let actual = -1;
+  function marcar(i) {
+    if (i === actual) return;
+    actual = i;
+    enlaces.forEach((a, k) => { if (k === i) a.setAttribute('aria-current', 'true'); else a.removeAttribute('aria-current'); });
+  }
+  function progreso() {
+    const max = document.documentElement.scrollHeight - window.innerHeight;
+    barra.style.transform = 'scaleX(' + (max > 0 ? Math.min(window.scrollY / max, 1) : 0) + ')';
+  }
+
+  /* ---------- visores: lo que vería la cámara */
+  function flecha(ctx, L, color) {
+    const w = L * 0.13, h = L * 0.32;
+    ctx.beginPath();
+    ctx.moveTo(-w / 2, L / 2); ctx.lineTo(w / 2, L / 2); ctx.lineTo(w / 2, -L / 2 + h); ctx.lineTo(w * 1.5, -L / 2 + h);
+    ctx.lineTo(0, -L / 2); ctx.lineTo(-w * 1.5, -L / 2 + h); ctx.lineTo(-w / 2, -L / 2 + h); ctx.closePath();
+    ctx.globalAlpha = 0.95; ctx.fillStyle = color; ctx.fill(); ctx.globalAlpha = 1;
+    ctx.lineWidth = Math.max(1, L * 0.012); ctx.strokeStyle = 'rgba(10, 40, 20, 0.65)'; ctx.stroke();
+  }
+  class Visor {
+    constructor(el) {
+      this.el = el; this.modo = el.dataset.visor; this.cv = el.querySelector('canvas'); this.ctx = this.cv.getContext('2d');
+      this.out = el.querySelector('[data-out]'); this.out2 = el.querySelector('[data-out2]'); this.marca = el.querySelector('.pista i');
+      this.on = !('IntersectionObserver' in window); this.psiC = 0; this.psiRef = 0; this.tTxt = 0; this.estatico = false;
+      if ('ResizeObserver' in window) new ResizeObserver(() => this.tamano()).observe(this.cv);
+      if ('IntersectionObserver' in window) new IntersectionObserver(es => { this.on = es[0].isIntersecting; }, { rootMargin: '120px' }).observe(el);
+      this.tamano();
+    }
+    tamano() {
+      const r = this.cv.getBoundingClientRect(), d = Math.min(window.devicePixelRatio || 1, 2);
+      const w = Math.max(1, Math.round(r.width * d)), h = Math.max(1, Math.round(r.height * d));
+      if (w !== this.cv.width || h !== this.cv.height) { this.cv.width = w; this.cv.height = h; }
+      if (this.modo === 'libre' && reduce) this.psiC = 47 * D2R;
+      if (this.modo === 'control' && reduce) this.psiC = -1.5 * D2R;
+      this.dibujar(); this.texto(true);
+    }
+    errorJuguete(tm) {
+      return (-1.5 + 0.9 * Math.sin(2 * Math.PI * 0.5 * tm) + 0.3 * Math.sin(2 * Math.PI * 1.3 * tm + 1)) * D2R;
+    }
+    paso(dt, tm) {
+      if (!this.on) return;
+      if (this.modo === 'orden') {
+        this.psiRef = ref.valor;
+        const objetivo = ref.valor + this.errorJuguete(tm);
+        this.psiC += wrapPi(objetivo - this.psiC) * (1 - Math.exp(-dt / 0.085));
+      } else if (reduce) {
+        if (this.estatico) return;
+        this.psiRef = 0; this.psiC = this.modo === 'libre' ? 47 * D2R : -1.5 * D2R; this.estatico = true;
+      } else {
+        this.estatico = false; this.psiRef = 0;
+        this.psiC = this.modo === 'libre' ? (32 * tm + 18 * Math.sin(2 * Math.PI * 0.2 * tm)) * D2R : this.errorJuguete(tm);
+      }
+      this.dibujar(); this.texto(false);
+    }
+    dibujar() {
+      const ctx = this.ctx, W = this.cv.width, H = this.cv.height;
+      const s = W / 256;
+      ctx.setTransform(1, 0, 0, 1, 0, 0);
+      ctx.fillStyle = '#86975f'; ctx.fillRect(0, 0, W, H);
+      ctx.save();
+      ctx.translate(W / 2, H / 2);
+      ctx.rotate(-this.psiC);
+      ctx.drawImage(suelo, -512 * s, -512 * s, 1024 * s, 1024 * s);
+      ctx.rotate(this.psiRef);
+      flecha(ctx, H * 0.46, '#36b56b');
+      ctx.restore();
+      const l = Math.max(1, W / 300), m = W * 0.06, a = W * 0.07, c = W * 0.035;
+      ctx.save();
+      ctx.lineWidth = l * 1.6; ctx.strokeStyle = 'rgba(255, 255, 255, 0.92)'; ctx.shadowColor = 'rgba(0, 0, 0, 0.45)'; ctx.shadowBlur = l * 3;
+      ctx.beginPath();
+      ctx.moveTo(m, m + a); ctx.lineTo(m, m); ctx.lineTo(m + a, m);
+      ctx.moveTo(W - m - a, m); ctx.lineTo(W - m, m); ctx.lineTo(W - m, m + a);
+      ctx.moveTo(W - m, H - m - a); ctx.lineTo(W - m, H - m); ctx.lineTo(W - m - a, H - m);
+      ctx.moveTo(m + a, H - m); ctx.lineTo(m, H - m); ctx.lineTo(m, H - m - a);
+      ctx.moveTo(W / 2 - c, H / 2); ctx.lineTo(W / 2 + c, H / 2); ctx.moveTo(W / 2, H / 2 - c); ctx.lineTo(W / 2, H / 2 + c);
+      ctx.moveTo(W / 2 - c * 0.7, m + c * 0.7); ctx.lineTo(W / 2, m); ctx.lineTo(W / 2 + c * 0.7, m + c * 0.7);
+      ctx.stroke();
+      ctx.restore();
+    }
+    texto(forzar) {
+      const ahora = performance.now();
+      if (!forzar && ahora - this.tTxt < 120) return;
+      this.tTxt = ahora;
+      const e = wrapPi(this.psiC - this.psiRef) / D2R;
+      const x = Math.max(-30, Math.min(30, e));
+      if (this.marca) { this.marca.style.left = (50 + x / 60 * 100) + '%'; this.marca.classList.toggle('fuera', Math.abs(e) > 10); }
+      if (this.out) this.out.textContent = grados(e, true);
+      if (this.out2) this.out2.textContent = grados(this.psiRef / D2R, false);
+    }
+  }
+  const visores = [...document.querySelectorAll('[data-visor]')].map(el => new Visor(el));
+
+  const botonGiro = document.getElementById('pedir-giro');
+  if (botonGiro) botonGiro.addEventListener('click', () => {
+    const a90 = Math.abs(ref.a) < 1e-6;
+    pedirGiro(a90 ? 90 * D2R : 0);
+    botonGiro.textContent = a90 ? 'Volver a 0°' : 'Pedir giro de 90°';
+  });
+
+  /* ---------- magnetómetro: el círculo corrido */
+  const iman = (() => {
+    const svg = document.getElementById('iman');
+    if (!svg) return { paso() {} };
+    const NS = 'http://www.w3.org/2000/svg', R = 28, C0 = { x: 4, y: -9 };
+    const circulo = svg.querySelector('#iman-circulo'), puntos = svg.querySelector('#iman-puntos');
+    const punto = svg.querySelector('#iman-punto'), rayoS = svg.querySelector('#iman-sensor'), rayoV = svg.querySelector('#iman-verdad');
+    const cp = svg.querySelector('#iman-cp'), arco = svg.querySelector('#iman-arco');
+    const salida = document.getElementById('iman-error'), deslizador = document.getElementById('iman-giro');
+    const botones = [...document.querySelectorAll('[data-cal]')];
+    const r = semilla(5);
+    for (let k = 0; k < 44; k++) {
+      const a = k / 44 * Math.PI * 2, rr = R + (r() - 0.5) * 2.2;
+      const d = document.createElementNS(NS, 'circle');
+      d.setAttribute('cx', (rr * Math.cos(a)).toFixed(2)); d.setAttribute('cy', (-rr * Math.sin(a)).toFixed(2)); d.setAttribute('r', '0.9');
+      puntos.appendChild(d);
+    }
+    let k = 0, kObj = 0, phi = 40 * D2R, manual = -100, on = !('IntersectionObserver' in window), tTxt = 0;
+    if ('IntersectionObserver' in window) new IntersectionObserver(es => { on = es[0].isIntersecting; }).observe(svg);
+    botones.forEach(b => b.addEventListener('click', () => {
+      kObj = b.dataset.cal === 'si' ? 1 : 0;
+      botones.forEach(o => o.setAttribute('aria-pressed', String(o === b)));
+    }));
+    deslizador.addEventListener('input', () => { phi = Number(deslizador.value) * D2R; manual = performance.now() / 1000; dibujar(true); });
+    function dibujar(forzar) {
+      const cx = C0.x * (1 - k), cy = C0.y * (1 - k);
+      const px = cx + R * Math.cos(phi), py = cy + R * Math.sin(phi);
+      circulo.setAttribute('transform', 'translate(' + cx.toFixed(2) + ' ' + (-cy).toFixed(2) + ')');
+      punto.setAttribute('cx', px.toFixed(2)); punto.setAttribute('cy', (-py).toFixed(2));
+      cp.setAttribute('x1', cx.toFixed(2)); cp.setAttribute('y1', (-cy).toFixed(2)); cp.setAttribute('x2', px.toFixed(2)); cp.setAttribute('y2', (-py).toFixed(2));
+      const aS = Math.atan2(py, px), aV = phi, err = wrapPi(aS - aV), L = 52;
+      rayoS.setAttribute('x2', (L * Math.cos(aS)).toFixed(2)); rayoS.setAttribute('y2', (-L * Math.sin(aS)).toFixed(2));
+      rayoV.setAttribute('x2', (L * Math.cos(aV)).toFixed(2)); rayoV.setAttribute('y2', (-L * Math.sin(aV)).toFixed(2));
+      const ra = 17;
+      if (Math.abs(err) < 0.004) arco.setAttribute('d', '');
+      else arco.setAttribute('d', 'M0 0L' + (ra * Math.cos(aV)).toFixed(2) + ' ' + (-ra * Math.sin(aV)).toFixed(2) +
+        'A' + ra + ' ' + ra + ' 0 0 ' + (err > 0 ? 0 : 1) + ' ' + (ra * Math.cos(aS)).toFixed(2) + ' ' + (-ra * Math.sin(aS)).toFixed(2) + 'Z');
+      const ahora = performance.now();
+      if (forzar || ahora - tTxt > 120) { tTxt = ahora; salida.textContent = grados(Math.abs(err) / D2R, false); }
+    }
+    dibujar(true);
+    return {
+      paso(dt) {
+        if (!on) return;
+        const ahora = performance.now() / 1000;
+        k += (kObj - k) * (1 - Math.exp(-dt * 5));
+        if (!reduce && ahora - manual > 4) {
+          phi = (phi + dt * 30 * D2R) % (Math.PI * 2);
+          deslizador.value = String(Math.round(phi / D2R) % 360);
+        }
+        dibujar(false);
+      }
+    };
+  })();
+
+  /* ---------- lupa e incrustación */
+  const lupa = document.getElementById('lupa');
+  document.querySelectorAll('[data-lupa]').forEach(b => b.addEventListener('click', () => {
+    const img = lupa.querySelector('img'), fuente = b.querySelector('img');
+    img.src = b.dataset.lupa; img.alt = fuente ? fuente.alt : '';
+    const cap = b.closest('figure') && b.closest('figure').querySelector('figcaption');
+    lupa.querySelector('.lupa-barra p').textContent = cap ? cap.textContent : '';
+    if (typeof lupa.showModal === 'function') lupa.showModal(); else lupa.setAttribute('open', '');
+  }));
+  document.getElementById('lupa-cerrar').addEventListener('click', () => lupa.close());
+  lupa.addEventListener('click', e => { if (e.target === lupa) lupa.close(); });
+  document.querySelectorAll('.embed').forEach(caja => {
+    caja.querySelector('.escudo').addEventListener('click', () => { caja.classList.add('activo'); caja.querySelector('iframe').focus(); });
+    if ('IntersectionObserver' in window) new IntersectionObserver(es => { if (!es[0].isIntersecting) caja.classList.remove('activo'); }).observe(caja);
+  });
+
+  /* ---------- escena 3D */
+  function iniciar3D() {
+    const T = window.THREE;
+    if (!T) return null;
+    const lienzo = document.getElementById('cielo');
+    const render = new T.WebGLRenderer({ canvas: lienzo, antialias: true, alpha: true, powerPreference: 'low-power' });
+    render.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+    render.setClearColor(0x000000, 0);
+    const escena = new T.Scene();
+    escena.fog = new T.Fog(0xdbe6f1, 30, 150);
+    const cam = new T.PerspectiveCamera(36, 1, 0.1, 500);
+    const luzCielo = new T.HemisphereLight(0xeaf2ff, 0x4f5c3e, 0.95); escena.add(luzCielo);
+    const sol = new T.DirectionalLight(0xffffff, 0.8); sol.position.set(12, 30, 16); escena.add(sol);
+
+    const tex = new T.CanvasTexture(suelo);
+    tex.wrapS = tex.wrapT = T.RepeatWrapping; tex.repeat.set(10, 10);
+    tex.anisotropy = Math.min(8, render.capabilities.getMaxAnisotropy());
+    const piso = new T.Mesh(new T.PlaneGeometry(400, 400), new T.MeshLambertMaterial({ map: tex }));
+    piso.rotation.x = -Math.PI / 2; escena.add(piso);
+
+    // referencia: flecha verde en el suelo
+    const forma = new T.Shape();
+    forma.moveTo(-0.45, -3); forma.lineTo(0.45, -3); forma.lineTo(0.45, 1.1); forma.lineTo(1.3, 1.1);
+    forma.lineTo(0, 3.4); forma.lineTo(-1.3, 1.1); forma.lineTo(-0.45, 1.1); forma.closePath();
+    const flechaRef = new T.Mesh(new T.ShapeGeometry(forma), new T.MeshBasicMaterial({ color: 0x34b368, transparent: true, opacity: 0.95, depthWrite: false }));
+    flechaRef.rotation.x = -Math.PI / 2;
+    const giroRef = new T.Group(); giroRef.position.y = 0.05; giroRef.add(flechaRef); escena.add(giroRef);
+    const puntaRef = new T.Object3D(); puntaRef.position.set(0, 0, -3.4); giroRef.add(puntaRef);
+
+    // huella de la cámara en el suelo
+    const HW = 10, HH = 7.5;
+    const huella = new T.Group(); escena.add(huella);
+    const relleno = new T.Mesh(new T.PlaneGeometry(HW, HH), new T.MeshBasicMaterial({ color: 0xd04fc4, transparent: true, opacity: 0.12, depthWrite: false }));
+    relleno.rotation.x = -Math.PI / 2; huella.add(relleno);
+    const borde = new T.LineSegments(new T.EdgesGeometry(new T.PlaneGeometry(HW, HH)), new T.LineBasicMaterial({ color: 0xd65ccb, transparent: true, opacity: 0.95 }));
+    borde.rotation.x = -Math.PI / 2; huella.add(borde);
+    const tri = new T.Shape(); tri.moveTo(-0.7, HH / 2 + 0.15); tri.lineTo(0.7, HH / 2 + 0.15); tri.lineTo(0, HH / 2 + 1.1); tri.closePath();
+    const arriba = new T.Mesh(new T.ShapeGeometry(tri), new T.MeshBasicMaterial({ color: 0xd65ccb, transparent: true, opacity: 0.95, depthWrite: false }));
+    arriba.rotation.x = -Math.PI / 2; huella.add(arriba);
+    const esquinaHuella = new T.Object3D(); esquinaHuella.position.set(HW / 2, 0, HH / 2); huella.add(esquinaHuella);
+    const esquinas = [[-HW / 2, -HH / 2], [HW / 2, -HH / 2], [HW / 2, HH / 2], [-HW / 2, HH / 2]].map(([x, z]) => new T.Vector3(x, 0, z));
+    const geoCono = new T.BufferGeometry(); geoCono.setAttribute('position', new T.BufferAttribute(new Float32Array(24), 3));
+    const cono = new T.LineSegments(geoCono, new T.LineBasicMaterial({ color: 0xd65ccb, transparent: true, opacity: 0.4 }));
+    cono.frustumCulled = false; escena.add(cono);
+
+    // PocketQube bajo el paracaídas
+    const columpio = new T.Group(); escena.add(columpio);
+    const giro = new T.Group(); columpio.add(giro);
+    const R = 2.4, TL = Math.PI * 0.42;
+    const geoDomo = new T.SphereGeometry(R, 16, 8, 0, Math.PI * 2, 0, TL).toNonIndexed();
+    const pd = geoDomo.attributes.position, colores = new Float32Array(pd.count * 3);
+    const rojo = new T.Color(0xd84646), rosa = new T.Color(0xf2a2a2);
+    for (let v = 0; v < pd.count; v += 3) {
+      let x = 0, z = 0;
+      for (let q = 0; q < 3; q++) { x += pd.getX(v + q); z += pd.getZ(v + q); }
+      const col = Math.floor((Math.atan2(z, x) + Math.PI) / (Math.PI / 4)) % 2 ? rojo : rosa;
+      for (let q = 0; q < 3; q++) { colores[(v + q) * 3] = col.r; colores[(v + q) * 3 + 1] = col.g; colores[(v + q) * 3 + 2] = col.b; }
+    }
+    geoDomo.setAttribute('color', new T.BufferAttribute(colores, 3));
+    const domo = new T.Mesh(geoDomo, new T.MeshStandardMaterial({ vertexColors: true, side: T.DoubleSide, roughness: 0.85, metalness: 0 }));
+    domo.position.y = -1.2; giro.add(domo);
+    const CUERPO_Y = -4.4, yBorde = -1.2 + R * Math.cos(TL), rBorde = R * Math.sin(TL);
+    const esq = [[0.45, 0.45], [-0.45, 0.45], [-0.45, -0.45], [0.45, -0.45]], lineas = [];
+    for (let q = 0; q < 8; q++) {
+      const a = (q + 0.5) * Math.PI / 4, e = esq[Math.floor(q / 2)];
+      lineas.push(Math.cos(a) * rBorde, yBorde, Math.sin(a) * rBorde, e[0], CUERPO_Y + 0.5, e[1]);
+    }
+    const geoCuerdas = new T.BufferGeometry(); geoCuerdas.setAttribute('position', new T.Float32BufferAttribute(lineas, 3));
+    giro.add(new T.LineSegments(geoCuerdas, new T.LineBasicMaterial({ color: 0x9b3a3a, transparent: true, opacity: 0.75 })));
+
+    const cuerpo = new T.Group(); cuerpo.position.y = CUERPO_Y; giro.add(cuerpo);
+    const matCasco = new T.MeshStandardMaterial({ color: 0xd9dfe7, roughness: 0.45, metalness: 0.35, transparent: true, opacity: 1 });
+    cuerpo.add(new T.Mesh(new T.BoxGeometry(1, 1, 1), matCasco));
+    const matBordes = new T.LineBasicMaterial({ color: 0x2a3442, transparent: true, opacity: 0.9 });
+    cuerpo.add(new T.LineSegments(new T.EdgesGeometry(new T.BoxGeometry(1, 1, 1)), matBordes));
+    const esp = new T.Mesh(new T.BoxGeometry(0.78, 0.035, 0.56), new T.MeshStandardMaterial({ color: 0x2f62cf, roughness: 0.6 }));
+    esp.position.y = -0.18; cuerpo.add(esp);
+    const bno = new T.Mesh(new T.BoxGeometry(0.36, 0.035, 0.3), new T.MeshStandardMaterial({ color: 0xf0cf3a, roughness: 0.5, emissive: 0x3a2f00 }));
+    bno.position.set(0.12, 0.12, 0.05); cuerpo.add(bno);
+    const chip = new T.Mesh(new T.BoxGeometry(0.12, 0.03, 0.12), new T.MeshStandardMaterial({ color: 0x1d1f24 }));
+    chip.position.set(0.12, 0.15, 0.05); cuerpo.add(chip);
+    [[0x8a6cf0, -0.28], [0x4d86ff, -0.2], [0x2fc7d6, -0.12]].forEach(([c, x]) => {
+      const led = new T.Mesh(new T.BoxGeometry(0.05, 0.03, 0.05), new T.MeshBasicMaterial({ color: c }));
+      led.position.set(x, -0.15, 0.2); cuerpo.add(led);
+    });
+    const servo = new T.Mesh(new T.CylinderGeometry(0.3, 0.3, 0.22, 28), new T.MeshStandardMaterial({ color: 0xe8862a, roughness: 0.5 }));
+    servo.position.y = -0.61; cuerpo.add(servo);
+    const camara = new T.Group(); camara.position.y = -0.72; cuerpo.add(camara);
+    const caja = new T.Mesh(new T.BoxGeometry(0.46, 0.3, 0.46), new T.MeshStandardMaterial({ color: 0xc94bbd, roughness: 0.45 }));
+    caja.position.y = -0.15; camara.add(caja);
+    const lente = new T.Mesh(new T.CylinderGeometry(0.13, 0.15, 0.16, 24), new T.MeshStandardMaterial({ color: 0x16161c, roughness: 0.2, metalness: 0.6 }));
+    lente.position.y = -0.36; camara.add(lente);
+    const muesca = new T.Mesh(new T.BoxGeometry(0.1, 0.1, 0.12), new T.MeshStandardMaterial({ color: 0xffffff }));
+    muesca.position.set(0, -0.15, -0.27); camara.add(muesca);
+
+    const ejes = new T.Group(); cuerpo.add(ejes);
+    const matsEjes = [], puntas = {};
+    [['ejeX', [1, 0, 0], 1.5], ['ejeY', [0, 0, 1], 1.5], ['ejeZ', [0, -1, 0], 1.6]].forEach(([n, d, L]) => {
+      const dir = new T.Vector3(d[0], d[1], d[2]);
+      const ah = new T.ArrowHelper(dir, new T.Vector3(0, 0, 0), L, 0x9aa8b8, 0.24, 0.13);
+      ah.traverse(o => { o.renderOrder = 10; if (o.material) { o.material.transparent = true; o.material.depthTest = false; o.material.opacity = 0; matsEjes.push(o.material); } });
+      ejes.add(ah);
+      const p = new T.Object3D(); p.position.copy(dir).multiplyScalar(L + 0.12); ejes.add(p); puntas[n] = p;
+    });
+
+    // dron para la prueba de caída
+    const dron = new T.Group(); escena.add(dron);
+    const matDron = new T.MeshStandardMaterial({ color: 0x2b3138, roughness: 0.6, metalness: 0.3, transparent: true, opacity: 0 });
+    const matHelice = new T.MeshBasicMaterial({ color: 0xa9bccf, transparent: true, opacity: 0, depthWrite: false });
+    dron.add(new T.Mesh(new T.BoxGeometry(1.4, 0.34, 1.0), matDron));
+    [[1, 1], [-1, 1], [-1, -1], [1, -1]].forEach(([sx, sz]) => {
+      const brazo = new T.Mesh(new T.BoxGeometry(1.77, 0.08, 0.12), matDron);
+      brazo.position.set(sx * 0.625, 0.05, sz * 0.625); brazo.rotation.y = -sx * sz * Math.PI / 4; dron.add(brazo);
+      const helice = new T.Mesh(new T.CylinderGeometry(0.62, 0.62, 0.02, 32), matHelice);
+      helice.position.set(sx * 1.25, 0.2, sz * 1.25); dron.add(helice);
+      const eje = new T.Mesh(new T.CylinderGeometry(0.08, 0.08, 0.18, 12), matDron);
+      eje.position.set(sx * 1.25, 0.11, sz * 1.25); dron.add(eje);
+    });
+    const geoCaida = new T.BufferGeometry(); geoCaida.setAttribute('position', new T.BufferAttribute(new Float32Array(6), 3));
+    const caida = new T.Line(geoCaida, new T.LineDashedMaterial({ color: 0x8395aa, dashSize: 0.35, gapSize: 0.3, transparent: true, opacity: 0 }));
+    caida.frustumCulled = false; escena.add(caida);
+
+    // una pose de cámara y un estado por diapositiva
+    const CLAVES = ['r', 'az', 'el', 'fx', 'spin', 'sway', 'shell', 'axes', 'drone'];
+    const K = [
+      { tgt: [0, 11.4, 0], r: 17, az: 30, el: 1, fx: 0.21, spin: 0, sway: 24, ctrl: 1, shell: 1, axes: 0, drone: 0 },
+      { tgt: [0, 6, 0], r: 25, az: 16, el: 33, fx: 0.2, spin: 35, sway: 14, ctrl: 0, shell: 1, axes: 0, drone: 0 },
+      { tgt: [0, 9.55, 0], r: 5.6, az: 36, el: 14, fx: 0.18, spin: 0, sway: 10, ctrl: 1, shell: 0.16, axes: 1, drone: 0 },
+      { tgt: [0, 9.6, 0], r: 15.5, az: -26, el: 10, fx: 0.2, spin: 18, sway: 12, ctrl: 1, shell: 1, axes: 0, drone: 0 },
+      { tgt: [0, 3.2, 0], r: 23, az: 4, el: 54, fx: 0.2, spin: 60, sway: 14, ctrl: 1, shell: 1, axes: 0, drone: 0 },
+      { tgt: [0, 9.7, 0], r: 5.6, az: -22, el: 18, fx: 0.18, spin: 6, sway: 6, ctrl: 1, shell: 0.16, axes: 0, drone: 0 },
+      { tgt: [0, 16.5, 0], r: 30, az: 24, el: 8, fx: 0.2, spin: 30, sway: 22, ctrl: 1, shell: 1, axes: 0, drone: 1 }
+    ];
+    const anclas = { paracaidas: domo, cuerpo, bno, esp, servo, camara: caja, flecha: puntaRef, huella: esquinaHuella, dron, ejeX: puntas.ejeX, ejeY: puntas.ejeY, ejeZ: puntas.ejeZ };
+    const etiquetas = [...document.querySelectorAll('#etiquetas .tag')]
+      .filter(el => anclas[el.dataset.a])
+      .map(el => ({ el, ancla: anclas[el.dataset.a], s: el.dataset.s.split(' ').map(Number), on: false }));
+
+    const v = new T.Vector3(), pl = new T.Vector3(), ARRIBA = 14.4;
+    let acum = 0, theta = 0, W = 1, H = 1;
+    function tamano() {
+      W = window.innerWidth; H = window.innerHeight;
+      render.setSize(W, H, false);
+      cam.aspect = W / H; cam.updateProjectionMatrix();
+    }
+    function tema() {
+      const cs = getComputedStyle(document.documentElement);
+      const niebla = cs.getPropertyValue('--fog').trim();
+      if (niebla) escena.fog.color.set(niebla);
+      const oscuro = cs.getPropertyValue('--modo').trim() === '1';
+      luzCielo.intensity = oscuro ? 0.78 : 0.95; sol.intensity = oscuro ? 0.62 : 0.8;
+    }
+    tema();
+    const mqOscuro = window.matchMedia('(prefers-color-scheme: dark)');
+    if (mqOscuro.addEventListener) mqOscuro.addEventListener('change', tema);
+    new MutationObserver(tema).observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
+
+    function cuadro(dtau, tm, pos) {
+      const k0 = Math.floor(pos.b), k1 = Math.min(k0 + 1, K.length - 1), t = pos.b - k0, A = K[k0], B = K[k1];
+      const P = {};
+      for (const c of CLAVES) P[c] = mezcla(A[c], B[c], t);
+      const tgt = [0, 1, 2].map(n => mezcla(A.tgt[n], B.tgt[n], t));
+      const control = K[Math.min(Math.round(pos.b), K.length - 1)].ctrl;
+
+      // el cuerpo gira (rojo) y el servo de juguete corrige: realimentación + prealimentación
+      acum += P.spin * D2R * dtau;
+      const fase = 2 * Math.PI * 0.16 * tm, sw = P.sway * D2R;
+      const psiB = acum + sw * Math.sin(fase);
+      const wB = P.spin * D2R + sw * 2 * Math.PI * 0.16 * Math.cos(fase);
+      if (control) theta += dtau * (6 * wrapPi(ref.valor - psiB - theta) - wB);
+      else theta += dtau * 6 * wrapPi(-theta);
+
+      columpio.position.set(0, ARRIBA, 0);
+      columpio.rotation.set(0.05 * Math.sin(0.9 * tm), 0, 0.04 * Math.sin(0.7 * tm + 1));
+      giro.rotation.y = -psiB;
+      camara.rotation.y = -theta;
+      giroRef.rotation.y = -ref.valor;
+      matCasco.opacity = P.shell; matCasco.depthWrite = P.shell > 0.97; matBordes.opacity = 0.3 + 0.6 * P.shell;
+      ejes.visible = P.axes > 0.01;
+      matsEjes.forEach(m => { m.opacity = P.axes; });
+      dron.visible = P.drone > 0.01;
+      matDron.opacity = P.drone; matHelice.opacity = 0.4 * P.drone; caida.material.opacity = 0.8 * P.drone;
+      const yDron = mezcla(19.5, 26, pos.i === K.length - 1 ? suave(pos.p) : 0);
+      dron.position.set(0, yDron, 0);
+      escena.updateMatrixWorld(true);
+
+      lente.getWorldPosition(pl);
+      huella.position.set(pl.x, 0.08, pl.z);
+      huella.rotation.y = -(psiB + theta);
+      huella.updateMatrixWorld(true);
+      const arr = geoCono.attributes.position.array;
+      esquinas.forEach((e, n) => {
+        v.copy(e).applyMatrix4(huella.matrixWorld);
+        arr[n * 6] = pl.x; arr[n * 6 + 1] = pl.y; arr[n * 6 + 2] = pl.z;
+        arr[n * 6 + 3] = v.x; arr[n * 6 + 4] = v.y; arr[n * 6 + 5] = v.z;
+      });
+      geoCono.attributes.position.needsUpdate = true;
+      const pc = geoCaida.attributes.position.array;
+      pc[0] = 0; pc[1] = yDron - 0.2; pc[2] = 0; pc[3] = 0; pc[4] = ARRIBA + 1.2; pc[5] = 0;
+      geoCaida.attributes.position.needsUpdate = true; caida.computeLineDistances();
+
+      const ancho = W >= 900, aspecto = W / H;
+      const r = P.r * (aspecto < 1 ? 1 + 1.1 * (1 - aspecto) : 1);
+      const el = (P.el - (ancho ? 0 : 14 * (1 - Math.min(pos.b, 1)))) * D2R, az = P.az * D2R;
+      cam.position.set(tgt[0] + r * Math.cos(el) * Math.sin(az), tgt[1] + r * Math.sin(el), tgt[2] + r * Math.cos(el) * Math.cos(az));
+      cam.lookAt(tgt[0], tgt[1], tgt[2]);
+      if (ancho) cam.setViewOffset(W, H, -P.fx * W, 0, W, H);
+      else cam.setViewOffset(W, H, 0, H * 0.2, W, H);
+      cam.updateMatrixWorld();
+      render.render(escena, cam);
+
+      if (!ancho) return;
+      const sec = Math.min(Math.round(pos.b), K.length - 1);
+      for (const e of etiquetas) {
+        if (e.s.indexOf(sec) !== -1) {
+          e.ancla.getWorldPosition(v); v.project(cam);
+          const visible = v.z < 1 && Math.abs(v.x) < 1.05 && Math.abs(v.y) < 1.05;
+          e.el.style.transform = 'translate(' + ((v.x + 1) / 2 * W).toFixed(1) + 'px,' + ((1 - v.y) / 2 * H).toFixed(1) + 'px)';
+          if (visible !== e.on) { e.on = visible; e.el.classList.toggle('on', visible); }
+        } else if (e.on) { e.on = false; e.el.classList.remove('on'); }
+      }
+    }
+    return { cuadro, tamano };
+  }
+
+  let escena3D = null;
+  try { escena3D = iniciar3D(); } catch (err) { escena3D = null; }
+  if (!escena3D) document.documentElement.classList.add('sin-3d');
+
+  function alCambiarTamano() { medir(); if (escena3D) escena3D.tamano(); }
+  window.addEventListener('resize', alCambiarTamano);
+  if ('ResizeObserver' in window) new ResizeObserver(medir).observe(document.querySelector('main'));
+  alCambiarTamano();
+
+  let tPrev = performance.now() / 1000, tm = 0;
+  function tick() {
+    const ahora = performance.now() / 1000;
+    const dt = Math.min(Math.max(ahora - tPrev, 0), 0.05);
+    tPrev = ahora;
+    const vel = reduce ? 0.15 : 1;
+    tm += dt * vel;
+    actualizarRef(ahora);
+    const pos = posicion();
+    marcar(pos.i); progreso();
+    if (escena3D) escena3D.cuadro(dt * vel, tm, pos);
+    for (const vi of visores) vi.paso(dt, tm);
+    iman.paso(dt);
+    requestAnimationFrame(tick);
+  }
+  requestAnimationFrame(tick);
+})();
+</script>

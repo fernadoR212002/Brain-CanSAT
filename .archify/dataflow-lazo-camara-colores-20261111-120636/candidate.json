@@ -1,0 +1,325 @@
+{
+  "schema_version": 1,
+  "diagram_type": "dataflow",
+  "meta": {
+    "title": "Lazo de la cámara en Simulink, por colores",
+    "locale": "es",
+    "output": ".archify/dataflow-lazo-camara-colores-20261111-120636/lazo-camara-colores.html",
+    "quality_profile": "showcase",
+    "repository": {
+      "url": "https://github.com/fernadoR212002/Brain-CanSAT.git",
+      "revision": "b4a45d286ccd93413154d89137f2cd844ee10918"
+    },
+    "legend": {
+      "entries": {
+        "emphasis": {
+          "label": "camino principal"
+        },
+        "security": {
+          "label": "perturbación"
+        },
+        "database": {
+          "label": "estimador"
+        },
+        "default": {
+          "label": "realimentación"
+        }
+      }
+    }
+  },
+  "stages": [
+    {
+      "label": "Pedido"
+    },
+    {
+      "label": "Control (ESP32)"
+    },
+    {
+      "label": "Hardware"
+    },
+    {
+      "label": "Recovery"
+    }
+  ],
+  "nodes": [
+    {
+      "id": "referencia",
+      "type": "backend",
+      "label": "Rumbo deseado",
+      "sublabel": "0°, luego 90°",
+      "tag": "referencia",
+      "stage": 0,
+      "row": 0,
+      "sources": [
+        {
+          "path": "sim/simulink_lazo_camara_l3.m",
+          "line": 70,
+          "end_line": 72,
+          "label": "giro de 90° a los 30 s"
+        },
+        {
+          "path": "sim/simulink_lazo_camara_l3.m",
+          "line": 175,
+          "end_line": 178,
+          "label": "bloque REFERENCIA"
+        }
+      ]
+    },
+    {
+      "id": "controlador",
+      "type": "frontend",
+      "label": "Controlador",
+      "sublabel": "compara y corrige",
+      "tag": "RST",
+      "stage": 1,
+      "row": 0,
+      "sources": [
+        {
+          "path": "sim/simulink_lazo_camara_l3.m",
+          "line": 50,
+          "end_line": 65,
+          "label": "diseño RST"
+        },
+        {
+          "path": "sim/simulink_lazo_camara_l3.m",
+          "line": 190,
+          "end_line": 201,
+          "label": "bloque CONTROLADOR"
+        }
+      ]
+    },
+    {
+      "id": "prealimentacion",
+      "type": "frontend",
+      "label": "Prealimentación",
+      "sublabel": "anticipa el giro",
+      "tag": "control",
+      "stage": 1,
+      "row": 1,
+      "sources": [
+        {
+          "path": "sim/simulink_lazo_camara_l3.m",
+          "line": 203,
+          "end_line": 208,
+          "label": "u_ff y suma de control"
+        }
+      ]
+    },
+    {
+      "id": "estimador",
+      "type": "database",
+      "label": "Estimador",
+      "sublabel": "¿a dónde mira?",
+      "tag": "filtro",
+      "stage": 1,
+      "row": 2,
+      "sources": [
+        {
+          "path": "sim/simulink_lazo_camara_l3.m",
+          "line": 252,
+          "end_line": 273,
+          "label": "bloque ESTIMADOR"
+        }
+      ]
+    },
+    {
+      "id": "servo",
+      "type": "messagebus",
+      "label": "Servo",
+      "sublabel": "gira la cámara",
+      "tag": "actuador ±6 V",
+      "stage": 2,
+      "row": 0,
+      "sources": [
+        {
+          "path": "sim/simulink_lazo_camara_l3.m",
+          "line": 210,
+          "end_line": 212,
+          "label": "bloque ACTUADOR"
+        }
+      ]
+    },
+    {
+      "id": "camara",
+      "type": "messagebus",
+      "label": "Cámara",
+      "sublabel": "motor + cámara",
+      "tag": "planta",
+      "stage": 2,
+      "row": 1,
+      "sources": [
+        {
+          "path": "sim/simulink_lazo_camara_l3.m",
+          "line": 214,
+          "end_line": 223,
+          "label": "bloque PLANTA"
+        }
+      ]
+    },
+    {
+      "id": "sensores",
+      "type": "cloud",
+      "label": "Sensores",
+      "sublabel": "BNO055",
+      "tag": "y codificador",
+      "stage": 2,
+      "row": 2,
+      "sources": [
+        {
+          "path": "sim/simulink_lazo_camara_l3.m",
+          "line": 225,
+          "end_line": 250,
+          "label": "bloque SENSORES"
+        }
+      ]
+    },
+    {
+      "id": "recovery",
+      "type": "security",
+      "label": "Recovery",
+      "sublabel": "gira el cuerpo",
+      "tag": "perturbación",
+      "stage": 3,
+      "row": 1,
+      "sources": [
+        {
+          "path": "sim/simulink_lazo_camara_l3.m",
+          "line": 128,
+          "end_line": 153,
+          "label": "giro del cuerpo S1 y S2"
+        },
+        {
+          "path": "sim/simulink_lazo_camara_l3.m",
+          "line": 180,
+          "end_line": 188,
+          "label": "bloque PERTURBACIÓN"
+        }
+      ]
+    }
+  ],
+  "flows": [
+    {
+      "id": "pedido",
+      "from": "referencia",
+      "to": "controlador",
+      "label": "rumbo pedido",
+      "variant": "emphasis"
+    },
+    {
+      "id": "orden",
+      "from": "controlador",
+      "to": "servo",
+      "label": "corrección",
+      "variant": "emphasis"
+    },
+    {
+      "id": "voltaje",
+      "from": "servo",
+      "to": "camara",
+      "label": "voltaje ±6 V",
+      "variant": "emphasis"
+    },
+    {
+      "id": "giro-camara",
+      "from": "recovery",
+      "to": "camara",
+      "label": "perturba",
+      "variant": "security"
+    },
+    {
+      "id": "giro-sensores",
+      "from": "recovery",
+      "to": "sensores",
+      "label": "giro medido",
+      "variant": "security",
+      "fromSide": "bottom",
+      "toSide": "right"
+    },
+    {
+      "id": "angulo",
+      "from": "camara",
+      "to": "sensores",
+      "label": "ángulo"
+    },
+    {
+      "id": "medidas",
+      "from": "sensores",
+      "to": "estimador",
+      "label": "giro y norte"
+    },
+    {
+      "id": "velocidad",
+      "from": "estimador",
+      "to": "prealimentacion",
+      "label": "velocidad cuerpo"
+    },
+    {
+      "id": "compensa",
+      "from": "prealimentacion",
+      "to": "servo",
+      "label": "compensación",
+      "fromSide": "right",
+      "toSide": "left"
+    },
+    {
+      "id": "realimentacion",
+      "from": "estimador",
+      "to": "controlador",
+      "label": "rumbo estimado",
+      "fromSide": "left",
+      "toSide": "left"
+    }
+  ],
+  "cards": [
+    {
+      "dot": "emerald",
+      "title": "Verde · lo que queremos",
+      "items": [
+        "La cámara mira a 0° y gira 90° cuando lo pide la estación en tierra (C11)"
+      ]
+    },
+    {
+      "dot": "rose",
+      "title": "Rojo · lo que estorba",
+      "items": [
+        "El recovery hace girar el cuerpo; ese giro llega a la cámara y a los sensores"
+      ]
+    },
+    {
+      "dot": "amber",
+      "title": "Amarillo · los ojos",
+      "items": [
+        "BNO055 en el ESP32 (giro y norte) y codificador del servo (ángulo de la cámara)"
+      ]
+    },
+    {
+      "dot": "violet",
+      "title": "Violeta · lo que creemos",
+      "items": [
+        "El estimador junta giróscopo y magnetómetro y calcula hacia dónde mira la cámara"
+      ]
+    },
+    {
+      "dot": "cyan",
+      "title": "Azul y cian · el control",
+      "items": [
+        "El controlador compara lo deseado con lo estimado y corrige",
+        "La prealimentación ve girar el cuerpo y compensa de una vez"
+      ]
+    },
+    {
+      "dot": "orange",
+      "title": "Naranja · lo que se mueve",
+      "items": [
+        "El servo recibe hasta ±6 V y gira la cámara; en Simulink la cámara (planta) es magenta"
+      ]
+    },
+    {
+      "dot": "slate",
+      "title": "Gris · lo que graficamos",
+      "items": [
+        "En Simulink, los osciloscopios muestran el error real, el error del control y el voltaje"
+      ]
+    }
+  ]
+}

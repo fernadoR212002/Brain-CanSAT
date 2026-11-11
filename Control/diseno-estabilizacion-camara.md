@@ -4,7 +4,7 @@ status: borrador
 id: diseno-estabilizacion-camara
 tags: [control, diseno, rumbo, camara, rst, prealimentacion, bno055, identificacion]
 created: 2026-11-08
-source: [raw/mision/cansat-mission-guide-2027-r1.1.pdf, raw/datos/notion-hardware-2026-10-25.md, raw/LINKS.md]
+source: [raw/mision/cansat-mission-guide-2027-r1.1.pdf, raw/datos/notion-hardware-2026-10-25.md, raw/LINKS.md, raw/pruebas/tst-003-1-magnetometro-sin-calibrar.png, raw/pruebas/tst-003-2-acelerometro-sin-calibrar.png, raw/pruebas/tst-003-3-orientacion-ndof-sin-calibrar.png]
 requisitos: []
 ---
 
@@ -167,9 +167,55 @@ Datos en [diseno-estabilizacion-camara-identificabilidad.csv](../derivados/disen
 > 3. TST de caída desde dron para medir el giro y el balanceo;
 > 4. confirmar P3 con un péndulo.
 
+## 9. Qué cambia con la primera lectura del BNO055 real (TST-003)
+
+[TST-003](../Pruebas/tst-003-bno055-sin-calibrar-esp32-matlab.md) es exploratoria y solo trajo capturas (lectura visual, sin CSV). No mide el actuador ni el giróscopo crudo, así que **no cambia la ley de control**: L3 sigue siendo la recomendación, y $K_c$ y $\tau_c$ siguen siendo supuestos. Lo que cambia es todo lo que rodea al lazo.
+
+| Tema | Lo que se vio | Qué cambia en el diseño |
+|---|---|---|
+| Calibración del magnetómetro | El círculo $m_x$–$m_y$ está corrido ≈ 10 µT frente a un radio de ≈ 28 µT, del orden de 20° de rumbo (TST-003·P1) | El estimador pasa a ser la ruta crítica de C8. La simulación supone 1,5° de residuo: hay que justificarlo midiendo, o repartir el presupuesto de los 10°. Nuevo riesgo [RSK-002](../Riesgos/rsk-002-calibracion-magnetometro.md), alto |
+| Eje Z del magnetómetro | $\lvert B\rvert$ ≈ 52 µT frente a ≈ 30 µT del sitio; la diferencia está en $m_z$ (TST-003·D2) | Calibrar en las tres dimensiones, no con un giro plano. Al nivelar con inclinación $\delta$, un desfase en Z suma $\approx b_z\sin\delta/H$ al rumbo (TST-003·P2) |
+| Calibración automática de NDOF | El magnetómetro necesitó movimiento para llegar a 3; el acelerómetro nunca llegó; el yaw saltó entre 0° y 360° mientras no estaba calibrado (TST-003·D5) | Refuerza D3: BNO055 en modo IMU y rumbo de un magnetómetro con **constantes propias en el firmware**. NDOF solo queda de respaldo, y únicamente con `cal_mag = 3` |
+| Acelerómetro en movimiento | $\lvert a\rvert$ entre ≈ 4 y ≈ 17 m/s² moviéndolo a mano (TST-003·D3) | Confirma P3 en banco. La inclinación sale de un filtro de actitud con giróscopos, y el acelerómetro solo corrige cuando $\lvert\lvert a\rvert-g\rvert$ es pequeño (umbral **Pendiente**) |
+| Frecuencia | El registro fue a 20 Hz con `millis()` y 115 200 baudios | El lazo tiene que correr a **100 Hz** en el microcontrolador (S2). A 20 Hz, la latencia de una muestra (50 ms) costaría ≈ Ω·L = 90 °/s × 0,05 s ≈ 4,5° en S2, frente a ≈ 0,9° a 100 Hz, y el RST habría que rediseñarlo, porque $\omega_nT$ pasa de 0,2 a 1. El puerto serie a 20 Hz solo sirve para registrar |
+| Tarjeta | El BNO055 funcionó por I²C (`0x29`) con un ESP32 clásico, no con el ESP32-S3 de la base Hardware | **Pendiente**: decidir la tarjeta. La base Hardware advierte problemas de I²C del BNO055 con el ESP32-S3 |
+| Envoltura del ángulo | NDOF da el yaw entre 0° y 360° y salta en el norte | El estimador ya usa la innovación envuelta a ±180°; hay que mantenerla en el firmware y desenrollar el ángulo antes de derivarlo |
+
+> [!IMPORTANT]
+> Siguiente paso de control. Con los CSV de TST-003 y los de TST-002, reemplazar en `sim/` los supuestos S3: el ruido del magnetómetro, el residuo de calibración y el sesgo del giróscopo. Después, agregar un barrido del desfase de hierro duro (horizontal y en Z, con balanceo), para saber qué residuo de calibración cabe en C8 junto al error de control y la latencia.
+
+## 10. Réplica en Simulink de L3
+
+[simulink_lazo_camara_l3.m](../sim/simulink_lazo_camara_l3.m) construye en Simulink el lazo L3 completo: referencia, giro del cuerpo, RST con anti-windup, prealimentación, actuador, planta, sensores y estimador. Cada bloque va **coloreado por su función**, con la leyenda en el propio modelo. Después simula S1 y S2. El diseño RST que calcula coincide con el de la sección 4: $R=(z-1)(z-0{,}2749)$, $S=8{,}138z^2-14{,}477z+6{,}472$ y $T=1{,}218\,(z-0{,}67)^2$.
+
+![Diagrama de Simulink de L3 con colores por función](../salida/figuras/simulink-lazo-camara-l3-modelo.png)
+
+| Color | Función | Bloques |
+|---|---|---|
+| verde | referencia | $\psi_{ref}$: giro de 90° a los 30 s (C11) |
+| rojo | perturbación | giro del cuerpo $\psi_b$, $\omega_b$, $\alpha_b$ (S4) |
+| azul | controlador | RST con integrador ($T$, $S$, $R$) y anti-windup ($u-u_{ff}$ realimentada) |
+| cian | prealimentación | $u_{ff}=-\hat\omega_b/K_c$ |
+| naranja | actuador | saturación de ±6 V |
+| magenta | planta | motor + cámara en espacio de estados, $\psi_c=\psi_b+\theta_g$ |
+| amarillo | sensores | giróscopo (latencia, sesgo, ruido, 16 LSB por °/s), magnetómetro (calibración, inclinación, ruido) y codificador de 12 bits |
+| violeta | estimador | observador $(\psi_b, b_g)$ y $\hat\psi_c=\hat\psi_b+\theta_{enc}$ |
+| gris | medición | error real, error de control, $u$, osciloscopios y variables al workspace |
+
+- **M8.** En Simulink, L3 da un máximo de $\lvert e\rvert$ de 3,01° en S1 y 2,60° en S2, y un error de control de 0,28° y 0,19° ([simulink-lazo-camara-l3-metricas.csv](../derivados/simulink-lazo-camara-l3-metricas.csv)). En Python habían salido 3,06° y 2,55°, con 0,27° y 0,21° (sección 5). La diferencia viene del generador de ruido; la conclusión M1 se mantiene.
+
+![Error de la cámara con L3 en Simulink](../salida/figuras/simulink-lazo-camara-l3.png)
+
+**Cómo usarlo en MATLAB:**
+1. Abrir MATLAB en la raíz del repo (`Brain-CanSAT`) y correr `run('sim/simulink_lazo_camara_l3.m')`, o abrir el script y pulsar Run. Tarda unos minutos, la mayor parte en cargar Simulink.
+2. El script carga las variables en el workspace, rearma el modelo, simula S1 y S2, imprime las métricas y deja abierto `lazo_camara_l3.slx` con el escenario S2.
+3. Para simular otra vez desde el modelo, pulsar Run en Simulink: usa las variables del workspace. Los osciloscopios grises muestran el error y la tensión $u$.
+4. Para cambiar el escenario: `escenario = 'S1'; run('sim/simulink_lazo_camara_l3.m')`. Para cambiar la planta real sin rediseñar el control: cambiar `Kc` o `tau` en el workspace y pulsar Run. El RST conserva el diseño hecho con los valores del script.
+
 ## Cómo se reproduce
 
 ```bash
 python3 -m pip install -r sim/requirements.txt
 python3 sim/diseno-estabilizacion-camara.py     # ≈ 1 min; imprime las tablas y escribe los CSV y la figura
+matlab -batch "run('sim/simulink_lazo_camara_l3.m')"   # réplica de L3 en Simulink (sección 10)
 ```
