@@ -66,6 +66,7 @@ Enlaces externos ([raw/LINKS.md](raw/LINKS.md)): L-01 modelo WMM2025 (NOAA) · L
 - [tst-002-guia-laboratorio-sensores.pdf](salida/tst-002-guia-laboratorio-sensores.pdf): TST-002 exportada a PDF para compartir con eléctrica (la fuente de verdad es la nota).
 - [figuras/diseno-estabilizacion-camara.png](salida/figuras/diseno-estabilizacion-camara.png): error de la cámara en S2 y zumbido del cero cancelado.
 - [figuras/simulink-lazo-camara-l3.png](salida/figuras/simulink-lazo-camara-l3.png): error de la cámara con L3 en Simulink (S1 y S2); [figuras/simulink-lazo-camara-l3-modelo.png](salida/figuras/simulink-lazo-camara-l3-modelo.png): el diagrama de Simulink con los colores por función.
+- [presentacion-control-camara/](salida/presentacion-control-camara/index.html): presentación para el equipo (7 diapositivas con three.js) del control de la cámara y del trabajo con el BNO055, con las capturas originales y el diagrama archify del lazo por colores. Artifact privado: https://claude.ai/artifact/7NkQKFxgatcrG7yPeDGqz4.
 - [figuras/l-07-reproduccion-str.png](salida/figuras/l-07-reproduccion-str.png) y [figuras/l-07-cero-de-muestreo.png](salida/figuras/l-07-cero-de-muestreo.png): figuras del ejemplo L-07.
 
 ## Memoria, guías y configuración

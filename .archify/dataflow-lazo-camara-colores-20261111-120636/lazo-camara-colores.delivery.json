@@ -1,0 +1,17 @@
+{
+  "schemaVersion": 1,
+  "receiptId": "e95a6eed-a6a2-4fdd-9d83-c9e74386b173",
+  "status": "current",
+  "command": "deliver",
+  "type": "dataflow",
+  "input": "/home/angelrevelo/Documents/Brain-CanSAT/.archify/dataflow-lazo-camara-colores-20261111-120636/candidate.json",
+  "output": "/home/angelrevelo/Documents/Brain-CanSAT/.archify/dataflow-lazo-camara-colores-20261111-120636/lazo-camara-colores.html",
+  "specification": {
+    "sha256": "4f5d0c8ca038a940c145b944c90178e790d8b450bd372d7ec84ad8d930fe3483",
+    "bytes": 7392
+  },
+  "artifact": {
+    "sha256": "22b3b552751bf889fc1ab232d89e0f42c71fa3fe8708700079f0077218a22b3b",
+    "bytes": 846533
+  }
+}

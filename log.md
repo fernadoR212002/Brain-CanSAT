@@ -160,3 +160,17 @@ Diario del brain. **Solo crece:** cada entrada se agrega al final con el encabez
   | S2 | 2,60° | 0,19° | 2,55° | 0,21° |
 
   Las métricas están en [simulink-lazo-camara-l3-metricas.csv](derivados/simulink-lazo-camara-l3-metricas.csv).
+
+## 2026-11-11 · salida · Presentación del control de la cámara para el equipo
+
+- Pedido del líder: diapositivas tipo landing page con three.js, máximo 7, que contextualicen el control, explicado con la regla de colores del modelo de Simulink, y el trabajo de Luis Edmundo Parra con el sensor. Sin tecnicismos y con las imágenes originales; el filtro del sensor queda como trabajo futuro y, al final, la necesidad de probar con el recovery.
+- Nueva [presentacion-control-camara](salida/presentacion-control-camara/index.html), publicada como Artifact privado (https://claude.ai/artifact/7NkQKFxgatcrG7yPeDGqz4):
+  1. portada con los dos autores;
+  2. el reto: C8, PQ15 y C11 literales (guía, p. 9 y 14) y dos visores ilustrativos;
+  3. el hardware: BNO055 y ESP32, con las 3 capturas de [TST-003](Pruebas/tst-003-bno055-sin-calibrar-esp32-matlab.md);
+  4. el control: los 9 colores (cálidos = mundo físico, fríos = software en el ESP32), una vuelta del lazo, el diagrama archify incrustado y la captura del modelo;
+  5. los resultados en Simulink: 3,01° y 2,60° frente a ±10°, con la figura y los osciloscopios;
+  6. el sensor real: el círculo del magnetómetro, interactivo, y lo que cambia (sección 9 del [diseño](Control/diseno-estabilizacion-camara.md));
+  7. lo que sigue: filtro en banco, calibración 3D, registro a 100 Hz, medir el motor y la prueba de caída desde dron con el recovery.
+- Los números salen de [simulink-lazo-camara-l3-metricas.csv](derivados/simulink-lazo-camara-l3-metricas.csv), de TST-003 y de la sección 9 del diseño. Las animaciones son ilustraciones y la página lo dice.
+- En el mismo commit van el [lazo_camara_l3.slx](sim/lazo_camara_l3.slx) y las dos figuras de `salida/figuras/` que el líder regeneró al correr el script en MATLAB, y la carpeta de archify del diagrama, sin las capturas de la revisión visual.
