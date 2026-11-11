@@ -111,3 +111,52 @@ Diario del brain. **Solo crece:** cada entrada se agrega al final con el encabez
 - Exportada a PDF para compartir: `salida/tst-002-guia-laboratorio-sensores.pdf`.
 - **Pendiente:** responsable, sitio de la prueba, modelo del servo (`Servos.pdf` sigue en `raw/inbox/` sin procesar) y las hojas de datos L-08 y L-09 para confirmar modos y registros.
 
+
+## 2026-11-11 · subir · TST-003, primera lectura del BNO055 real sin calibrar
+
+- El líder subió dos carpetas de su compañero: los proyectos de PlatformIO con los scripts de MATLAB y una guía de calibración, y tres capturas de las gráficas «sin calibrar».
+- Fuentes nuevas en `raw/pruebas/` con el prefijo `tst-003-`:
+  - 3 capturas;
+  - 3 programas del ESP32 y un `platformio.ini` (los tres eran idénticos);
+  - 3 scripts de MATLAB;
+  - la guía de calibración.
+- Quedaron fuera de git, en `raw/inbox/`:
+  - las carpetas `.pio`, unos 96 MB de compilados que se pueden regenerar;
+  - las carpetas `.vscode`, con rutas de Windows que incluyen el nombre del compañero (regla 7);
+  - los README de plantilla de PlatformIO.
+  **Pendiente:** que el líder autorice borrarlos del inbox.
+- Nueva nota [TST-003](Pruebas/tst-003-bno055-sin-calibrar-esp32-matlab.md): exploratoria, no concluyente y con lectura visual, porque no llegaron los CSV que guarda MATLAB. Lo que mostró:
+  1. el BNO055 funciona por I²C (`0x29`) con un ESP32 clásico, a 20 Hz;
+  2. el círculo $m_x$–$m_y$ está corrido ≈ 10 µT frente a un radio de ≈ 28 µT, del orden de 20° de rumbo sin calibrar;
+  3. $\lvert B\rvert$ ≈ 52 µT frente a ≈ 30 µT del sitio, con la diferencia en $m_z$;
+  4. el acelerómetro se aleja de $g$ al moverlo;
+  5. la calibración interna de NDOF necesitó movimiento, y la del acelerómetro nunca llegó a 3.
+- No es la ejecución de TST-002: cambian la tarjeta, la frecuencia, las unidades, los sensores y falta el giróscopo crudo.
+- Control: nueva sección 9 en [diseno-estabilizacion-camara](Control/diseno-estabilizacion-camara.md).
+  - La ley L3 no cambia.
+  - El estimador y la calibración del magnetómetro pasan a ser la ruta crítica de C8.
+  - El lazo debe correr a 100 Hz.
+  - NDOF solo sirve de respaldo con `cal_mag = 3`.
+- Nuevo [RSK-002](Riesgos/rsk-002-calibracion-magnetometro.md) (alto): el rumbo magnético queda mal calibrado en vuelo.
+
+## 2026-11-11 · control · Réplica en Simulink del lazo L3 con colores por función
+
+- Pedido del líder: cómo correr la simulación en Simulink, con cada bloque coloreado según su función. No había ningún modelo de Simulink, así que se construyó uno por código.
+- Nuevo [simulink_lazo_camara_l3.m](sim/simulink_lazo_camara_l3.m), que genera [lazo_camara_l3.slx](sim/lazo_camara_l3.slx). Los colores:
+  - verde: referencia;
+  - rojo: perturbación;
+  - azul: RST;
+  - cian: prealimentación;
+  - naranja: actuador;
+  - magenta: planta;
+  - amarillo: sensores;
+  - violeta: estimador;
+  - gris: medición.
+- El diseño RST coincide con el de Python, y las métricas se parecen aunque el ruido sale de otro generador:
+
+  | Escenario | Simulink: máx \|e\| | Simulink: error de control | Python: máx \|e\| | Python: error de control |
+  |---|---|---|---|---|
+  | S1 | 3,01° | 0,28° | 3,06° | 0,27° |
+  | S2 | 2,60° | 0,19° | 2,55° | 0,21° |
+
+  Las métricas están en [simulink-lazo-camara-l3-metricas.csv](derivados/simulink-lazo-camara-l3-metricas.csv).
