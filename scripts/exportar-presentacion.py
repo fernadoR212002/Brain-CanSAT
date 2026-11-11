@@ -65,13 +65,7 @@ def main():
         "  }));\n\n"
         "  /* ---------- escena 3D */")
 
-    # 4. Una nota para quien recibe el archivo.
-    pagina = reemplazar(
-        pagina, '<p class="firmas">',
-        "<p>Versión de un solo archivo. La escena 3D y las tipografías se cargan de internet;"
-        " sin conexión, el resto de la página funciona igual.</p>\n  <p class=\"firmas\">")
-
-    # 5. Documento completo: el Artifact agrega el encabezado al publicar; aquí va explícito.
+    # 4. Documento completo: el Artifact agrega el encabezado al publicar; aquí va explícito.
     corte = pagina.index("</style>") + len("</style>")
     documento = ("<!doctype html>\n<html lang=\"es\">\n<head>\n<meta charset=\"utf-8\">\n"
                  "<meta name=\"viewport\" content=\"width=device-width, initial-scale=1, viewport-fit=cover\">\n"

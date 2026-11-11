@@ -193,3 +193,13 @@ Diario del brain. **Solo crece:** cada entrada se agrega al final con el encabez
   - el círculo interactivo del magnetómetro;
   - la lupa.
 - La escena 3D (three.js, cdnjs) y las tipografías se cargan de internet. La fuente de verdad sigue siendo la carpeta `salida/presentacion-control-camara/`, y el archivo se regenera con el script.
+
+## 2026-11-11 · salida · Presentación sin avisos de faltantes
+
+- Pedido del líder, al ver la presentación en el celular: no poner avisos de archivos o datos que faltan, como el de los CSV.
+- Cambios en [presentacion-control-camara](salida/presentacion-control-camara/index.html):
+  - diapositiva 6: sale «Valores leídos a ojo de las capturas. Faltan los CSV para medirlos con un script.»;
+  - diapositiva 5: la nota «Todavía son supuestos… Ninguno de los dos se ha medido.» pasa a «Con qué se simuló», con los mismos valores del motor y los escenarios S1 y S2.
+- [exportar-presentacion.py](scripts/exportar-presentacion.py) ya no agrega la nota «Versión de un solo archivo…». [presentacion-control-camara.html](salida/presentacion-control-camara.html) quedó regenerado.
+- Se mantienen el cierre con el recovery, que pidió el líder, las etiquetas de ilustración y los «≈» de los valores leídos de las capturas.
+- El Artifact quedó en la versión 2, con el mismo enlace. Lo que falta sigue registrado en el brain: los CSV de TST-003 están en el punto 8 de [estado.md](estado.md).
