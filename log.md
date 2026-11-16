@@ -111,3 +111,95 @@ Diario del brain. **Solo crece:** cada entrada se agrega al final con el encabez
 - Exportada a PDF para compartir: `salida/tst-002-guia-laboratorio-sensores.pdf`.
 - **Pendiente:** responsable, sitio de la prueba, modelo del servo (`Servos.pdf` sigue en `raw/inbox/` sin procesar) y las hojas de datos L-08 y L-09 para confirmar modos y registros.
 
+
+## 2026-11-11 · subir · TST-003, primera lectura del BNO055 real sin calibrar
+
+- El líder subió dos carpetas de su compañero: los proyectos de PlatformIO con los scripts de MATLAB y una guía de calibración, y tres capturas de las gráficas «sin calibrar».
+- Fuentes nuevas en `raw/pruebas/` con el prefijo `tst-003-`:
+  - 3 capturas;
+  - 3 programas del ESP32 y un `platformio.ini` (los tres eran idénticos);
+  - 3 scripts de MATLAB;
+  - la guía de calibración.
+- Quedaron fuera de git, en `raw/inbox/`:
+  - las carpetas `.pio`, unos 96 MB de compilados que se pueden regenerar;
+  - las carpetas `.vscode`, con rutas de Windows que incluyen el nombre del compañero (regla 7);
+  - los README de plantilla de PlatformIO.
+  **Pendiente:** que el líder autorice borrarlos del inbox.
+- Nueva nota [TST-003](Pruebas/tst-003-bno055-sin-calibrar-esp32-matlab.md): exploratoria, no concluyente y con lectura visual, porque no llegaron los CSV que guarda MATLAB. Lo que mostró:
+  1. el BNO055 funciona por I²C (`0x29`) con un ESP32 clásico, a 20 Hz;
+  2. el círculo $m_x$–$m_y$ está corrido ≈ 10 µT frente a un radio de ≈ 28 µT, del orden de 20° de rumbo sin calibrar;
+  3. $\lvert B\rvert$ ≈ 52 µT frente a ≈ 30 µT del sitio, con la diferencia en $m_z$;
+  4. el acelerómetro se aleja de $g$ al moverlo;
+  5. la calibración interna de NDOF necesitó movimiento, y la del acelerómetro nunca llegó a 3.
+- No es la ejecución de TST-002: cambian la tarjeta, la frecuencia, las unidades, los sensores y falta el giróscopo crudo.
+- Control: nueva sección 9 en [diseno-estabilizacion-camara](Control/diseno-estabilizacion-camara.md).
+  - La ley L3 no cambia.
+  - El estimador y la calibración del magnetómetro pasan a ser la ruta crítica de C8.
+  - El lazo debe correr a 100 Hz.
+  - NDOF solo sirve de respaldo con `cal_mag = 3`.
+- Nuevo [RSK-002](Riesgos/rsk-002-calibracion-magnetometro.md) (alto): el rumbo magnético queda mal calibrado en vuelo.
+
+## 2026-11-11 · control · Réplica en Simulink del lazo L3 con colores por función
+
+- Pedido del líder: cómo correr la simulación en Simulink, con cada bloque coloreado según su función. No había ningún modelo de Simulink, así que se construyó uno por código.
+- Nuevo [simulink_lazo_camara_l3.m](sim/simulink_lazo_camara_l3.m), que genera [lazo_camara_l3.slx](sim/lazo_camara_l3.slx). Los colores:
+  - verde: referencia;
+  - rojo: perturbación;
+  - azul: RST;
+  - cian: prealimentación;
+  - naranja: actuador;
+  - magenta: planta;
+  - amarillo: sensores;
+  - violeta: estimador;
+  - gris: medición.
+- El diseño RST coincide con el de Python, y las métricas se parecen aunque el ruido sale de otro generador:
+
+  | Escenario | Simulink: máx \|e\| | Simulink: error de control | Python: máx \|e\| | Python: error de control |
+  |---|---|---|---|---|
+  | S1 | 3,01° | 0,28° | 3,06° | 0,27° |
+  | S2 | 2,60° | 0,19° | 2,55° | 0,21° |
+
+  Las métricas están en [simulink-lazo-camara-l3-metricas.csv](derivados/simulink-lazo-camara-l3-metricas.csv).
+
+## 2026-11-11 · salida · Presentación del control de la cámara para el equipo
+
+- Pedido del líder: diapositivas tipo landing page con three.js, máximo 7, que contextualicen el control, explicado con la regla de colores del modelo de Simulink, y el trabajo de Luis Edmundo Parra con el sensor. Sin tecnicismos y con las imágenes originales; el filtro del sensor queda como trabajo futuro y, al final, la necesidad de probar con el recovery.
+- Nueva [presentacion-control-camara](salida/presentacion-control-camara/index.html), publicada como Artifact privado (https://claude.ai/artifact/7NkQKFxgatcrG7yPeDGqz4):
+  1. portada con los dos autores;
+  2. el reto: C8, PQ15 y C11 literales (guía, p. 9 y 14) y dos visores ilustrativos;
+  3. el hardware: BNO055 y ESP32, con las 3 capturas de [TST-003](Pruebas/tst-003-bno055-sin-calibrar-esp32-matlab.md);
+  4. el control: los 9 colores (cálidos = mundo físico, fríos = software en el ESP32), una vuelta del lazo, el diagrama archify incrustado y la captura del modelo;
+  5. los resultados en Simulink: 3,01° y 2,60° frente a ±10°, con la figura y los osciloscopios;
+  6. el sensor real: el círculo del magnetómetro, interactivo, y lo que cambia (sección 9 del [diseño](Control/diseno-estabilizacion-camara.md));
+  7. lo que sigue: filtro en banco, calibración 3D, registro a 100 Hz, medir el motor y la prueba de caída desde dron con el recovery.
+- Los números salen de [simulink-lazo-camara-l3-metricas.csv](derivados/simulink-lazo-camara-l3-metricas.csv), de TST-003 y de la sección 9 del diseño. Las animaciones son ilustraciones y la página lo dice.
+- En el mismo commit van el [lazo_camara_l3.slx](sim/lazo_camara_l3.slx) y las dos figuras de `salida/figuras/` que el líder regeneró al correr el script en MATLAB, y la carpeta de archify del diagrama, sin las capturas de la revisión visual.
+
+## 2026-11-11 · salida · Versión de un solo archivo de la presentación
+
+- Pedido del líder: un archivo de la presentación para exportarlo y enviarlo al equipo.
+- Nuevo [exportar-presentacion.py](scripts/exportar-presentacion.py), solo con la biblioteca estándar. Escribe [presentacion-control-camara.html](salida/presentacion-control-camara.html), de 2,7 MB. Lleva adentro:
+  - las 7 capturas, en base64;
+  - el diagrama de archify, por `srcdoc`, con un botón de pantalla completa en lugar del enlace;
+  - una nota para quien lo recibe.
+- Revisado en Chromium, abierto directo del disco:
+  - carga la escena 3D;
+  - el diagrama se dibuja dentro de la página;
+  - aparecen las 7 imágenes y funciona la lupa;
+  - la consola no muestra errores.
+- Sin JavaScript, como en la vista previa de WhatsApp en iPhone, la página se sigue leyendo: el texto, las imágenes y las barras. Lo que se pierde:
+  - la escena 3D;
+  - los visores animados;
+  - el círculo interactivo del magnetómetro;
+  - la lupa.
+- La escena 3D (three.js, cdnjs) y las tipografías se cargan de internet. La fuente de verdad sigue siendo la carpeta `salida/presentacion-control-camara/`, y el archivo se regenera con el script.
+
+## 2026-11-11 · salida · Presentación sin avisos de faltantes
+
+- Pedido del líder, al ver la presentación en el celular: no poner avisos de archivos o datos que faltan, como el de los CSV.
+- Cambios en [presentacion-control-camara](salida/presentacion-control-camara/index.html):
+  - diapositiva 6: sale «Valores leídos a ojo de las capturas. Faltan los CSV para medirlos con un script.»;
+  - diapositiva 5: la nota «Todavía son supuestos… Ninguno de los dos se ha medido.» pasa a «Con qué se simuló», con los mismos valores del motor y los escenarios S1 y S2.
+- [exportar-presentacion.py](scripts/exportar-presentacion.py) ya no agrega la nota «Versión de un solo archivo…». [presentacion-control-camara.html](salida/presentacion-control-camara.html) quedó regenerado.
+- Se mantienen el cierre con el recovery, que pidió el líder, las etiquetas de ilustración y los «≈» de los valores leídos de las capturas.
+- El Artifact quedó en la versión 2, con el mismo enlace. Lo que falta sigue registrado en el brain: los CSV de TST-003 están en el punto 8 de [estado.md](estado.md).
