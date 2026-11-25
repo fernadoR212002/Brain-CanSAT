@@ -7,24 +7,18 @@ Second brain del equipo para la competencia académica CanSat: fuentes inmutable
 <!-- estado:inicio · lo reescribe la skill estado -->
 ## Estado
 
-_Actualizado: 2026-10-25 (America/Bogota)._
+_Actualizado el 19 de noviembre de 2026 (America/Bogota)._
 
 | Indicador | Valor |
 |---|---|
-| Competencia | CanSat Competition 2027, formato PocketQube ([ficha de la guía](Mision/guia-mision-2027.md)) |
-| Próxima revisión | PDR: 28-ene-2027 a las 23:59:59 UTC (18:59 en Bogotá) |
-| Días restantes | 95 |
-| Requisitos de control verificados | 0 de 0 (los RQ aún no están cargados) |
-| Riesgos altos abiertos | 0 |
-| Próximo paso | subir las hojas de datos, decidir el actuador de la cámara e identificar el servo |
+| Competencia | CanSat Competition 2027, formato PocketQube |
+| Próxima revisión | PDR el 28 de enero de 2027 a las 18:59:59 de Bogotá. Faltan 70 días. La tabla 1 de la [guía](Mision/guia-mision-2027.md) señala el 30 de enero. |
+| Requisitos de control verificados | 0 de 0 registrados en la [matriz](salida/matriz-requisitos.csv). |
+| Riesgos altos abiertos | 1 por la [calibración del magnetómetro](Riesgos/rsk-002-calibracion-magnetometro.md). |
+| Avance para el equipo | [Animación sobre el control de la cámara](salida/antares-control-15s.mp4). |
 
-> [!WARNING]
-> **Pendiente**
-> 1. Integrantes del equipo y frente de cada uno.
-> 2. Alcance completo de «control» (el primer frente es la estabilización de video).
-> 3. Si el repositorio es solo del líder de control o de todo el equipo.
-> 4. Confirmar con la organización qué fechas valen, el sitio de lanzamiento y si el norte es el verdadero o el magnético.
-> 5. Las hojas de datos oficiales del BNO055 y del LIS3MDL, y la decisión del actuador de la cámara.
+Los siguientes pasos son recuperar los CSV de TST-003 y calibrar el sensor en banco, registrar los requisitos de rumbo y caracterizar el actuador. [Estado y pendientes](estado.md)
+
 <!-- estado:fin -->
 
 ## Hitos

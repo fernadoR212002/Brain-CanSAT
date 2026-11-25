@@ -1,0 +1,14 @@
+{
+  "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "'/home/angelrevelo/Documents/Brain-CanSAT/.codex/hooks/session-start.sh'"
+          }
+        ]
+      }
+    ]
+  }
+}

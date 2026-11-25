@@ -1,0 +1,365 @@
+{
+  "schemaVersion": 1,
+  "ok": true,
+  "command": "finalize",
+  "status": "pass",
+  "type": "explainer",
+  "quality": "showcase",
+  "startedAt": "2026-11-22T19:18:24.228Z",
+  "specification": {
+    "path": "/home/angelrevelo/Documents/Brain-CanSAT/.archify/explainer-filtro-kalman-rumbo-20261122-140528/candidate.archify.md",
+    "sha256": "ed7453e5e49fa8827cc623c68ce51b7d26d02629df05205ffc8f254fe445b80f",
+    "bytes": 12400
+  },
+  "artifact": {
+    "path": "/home/angelrevelo/Documents/Brain-CanSAT/.archify/explainer-filtro-kalman-rumbo-20261122-140528/filtro-kalman-rumbo.html",
+    "sha256": "9dd297349b80a5b15c329d2bc619ad33da9bd8775014ece231934b7612e710dc",
+    "bytes": 642328
+  },
+  "stages": {
+    "browser-check": {
+      "status": "not-run",
+      "execution": "not-requested"
+    },
+    "validate": {
+      "status": "pass",
+      "exitCode": 0,
+      "durationMs": null,
+      "execution": "embedded-in-deliver",
+      "command": [
+        "/home/angelrevelo/.local/node-v26.13.0-linux-x64/bin/node",
+        "/home/angelrevelo/Documents/Skills/archify/bin/archify.mjs",
+        "deliver",
+        "explainer",
+        "/home/angelrevelo/Documents/Brain-CanSAT/.archify/explainer-filtro-kalman-rumbo-20261122-140528/candidate.archify.md",
+        "/home/angelrevelo/Documents/Brain-CanSAT/.archify/explainer-filtro-kalman-rumbo-20261122-140528/filtro-kalman-rumbo.html",
+        "--quality",
+        "showcase",
+        "--json"
+      ],
+      "receipt": {
+        "schemaVersion": 1,
+        "ok": true,
+        "command": "validate",
+        "specification": {
+          "sha256": "ed7453e5e49fa8827cc623c68ce51b7d26d02629df05205ffc8f254fe445b80f",
+          "bytes": 12400
+        },
+        "validation": {
+          "checksPassed": 4,
+          "checkCount": 4,
+          "compositionProfile": "showcase",
+          "compositionStatus": "pass",
+          "errors": 0,
+          "warnings": 0
+        }
+      }
+    },
+    "deliver": {
+      "status": "pass",
+      "exitCode": 0,
+      "durationMs": 1597,
+      "command": [
+        "/home/angelrevelo/.local/node-v26.13.0-linux-x64/bin/node",
+        "/home/angelrevelo/Documents/Skills/archify/bin/archify.mjs",
+        "deliver",
+        "explainer",
+        "/home/angelrevelo/Documents/Brain-CanSAT/.archify/explainer-filtro-kalman-rumbo-20261122-140528/candidate.archify.md",
+        "/home/angelrevelo/Documents/Brain-CanSAT/.archify/explainer-filtro-kalman-rumbo-20261122-140528/filtro-kalman-rumbo.html",
+        "--quality",
+        "showcase",
+        "--json"
+      ],
+      "receipt": {
+        "schemaVersion": 1,
+        "receiptId": "5899367e-6095-4406-ad1c-43ef923b3d44",
+        "ok": true,
+        "command": "deliver",
+        "type": "explainer",
+        "input": "/home/angelrevelo/Documents/Brain-CanSAT/.archify/explainer-filtro-kalman-rumbo-20261122-140528/candidate.archify.md",
+        "output": "/home/angelrevelo/Documents/Brain-CanSAT/.archify/explainer-filtro-kalman-rumbo-20261122-140528/filtro-kalman-rumbo.html",
+        "explainer": {
+          "preparedSha256": "3a510396addc9c2d06d96757db3bc190ce9cbbc7620992c477cf863440ac59f9",
+          "dependencies": [
+            {
+              "kind": "data",
+              "id": "chart-ccb12494ebde",
+              "path": "/home/angelrevelo/Documents/Brain-CanSAT/.archify/explainer-filtro-kalman-rumbo-20261122-140528/ganancia-rumbo.csv",
+              "sha256": "a8dd6666061bfa397eaf5ab06d1c980dcb6a43ac00fe88ac2d866cc9514d75c2",
+              "bytes": 1075
+            },
+            {
+              "kind": "data",
+              "id": "chart-2f213822b6d1",
+              "path": "/home/angelrevelo/Documents/Brain-CanSAT/.archify/explainer-filtro-kalman-rumbo-20261122-140528/sesgo-ruido-blanco.csv",
+              "sha256": "c7a5ee48bfa9afb5b9da2410f3ee71b363c0f9b2a0f334f44169c6a3b37f5a08",
+              "bytes": 1460
+            },
+            {
+              "kind": "data",
+              "id": "chart-8f471c565141",
+              "path": "/home/angelrevelo/Documents/Brain-CanSAT/.archify/explainer-filtro-kalman-rumbo-20261122-140528/sesgo-error-nominal.csv",
+              "sha256": "e7517ec2619c6f965f5b4f5209d550ac08ce18db211f53224a375c380ff782fe",
+              "bytes": 1464
+            },
+            {
+              "kind": "data",
+              "id": "chart-cd87122a924f",
+              "path": "/home/angelrevelo/Documents/Brain-CanSAT/.archify/explainer-filtro-kalman-rumbo-20261122-140528/perturbacion.csv",
+              "sha256": "31c5160d90445008b26d2536d7e29b5c4db18334c135b72ab86782cbb0471cf1",
+              "bytes": 1852
+            },
+            {
+              "kind": "diagram-spec",
+              "id": "ciclo-kalman",
+              "inline": true,
+              "sha256": "435185523d61350cd6c78b797a49a9f525bd5d9392f1f6fd5264ddf9794d4a80",
+              "bytes": 1627
+            }
+          ]
+        },
+        "specification": {
+          "sha256": "ed7453e5e49fa8827cc623c68ce51b7d26d02629df05205ffc8f254fe445b80f",
+          "bytes": 12400
+        },
+        "artifact": {
+          "sha256": "9dd297349b80a5b15c329d2bc619ad33da9bd8775014ece231934b7612e710dc",
+          "bytes": 642328
+        },
+        "validation": {
+          "checksPassed": 4,
+          "checkCount": 4,
+          "compositionProfile": "showcase",
+          "compositionStatus": "pass",
+          "errors": 0,
+          "warnings": 0
+        },
+        "update": {
+          "status": "unavailable",
+          "installedVersion": null,
+          "availableVersion": null,
+          "releaseNotes": null,
+          "checkedAt": null,
+          "source": null,
+          "noticeRequired": false,
+          "noticeText": null,
+          "reason": "disabled"
+        }
+      }
+    },
+    "check": {
+      "status": "pass",
+      "exitCode": 0,
+      "durationMs": 1043,
+      "command": [
+        "/home/angelrevelo/.local/node-v26.13.0-linux-x64/bin/node",
+        "/home/angelrevelo/Documents/Skills/archify/bin/archify.mjs",
+        "check",
+        "/home/angelrevelo/Documents/Brain-CanSAT/.archify/explainer-filtro-kalman-rumbo-20261122-140528/filtro-kalman-rumbo.html",
+        "--require-provenance"
+      ],
+      "receipt": {
+        "ok": true,
+        "file": "/home/angelrevelo/Documents/Brain-CanSAT/.archify/explainer-filtro-kalman-rumbo-20261122-140528/filtro-kalman-rumbo.html",
+        "family": "explainer",
+        "artifact": {
+          "sha256": "9dd297349b80a5b15c329d2bc619ad33da9bd8775014ece231934b7612e710dc",
+          "bytes": 642328
+        },
+        "checks": [
+          {
+            "name": "explainer_structure",
+            "ok": true,
+            "details": [
+              "73 unique DOM IDs"
+            ]
+          },
+          {
+            "name": "explainer_payload_identity",
+            "ok": true,
+            "details": []
+          },
+          {
+            "name": "explainer_dependencies",
+            "ok": true,
+            "details": [
+              "5 frozen dependencies"
+            ]
+          },
+          {
+            "name": "explainer_native_diagrams",
+            "ok": true,
+            "details": [
+              "ciclo-kalman: pass"
+            ]
+          }
+        ],
+        "composition": {
+          "schemaVersion": 1,
+          "profile": "showcase",
+          "status": "pass",
+          "summary": {
+            "errors": 0,
+            "warnings": 0
+          },
+          "issues": [],
+          "nativeDiagrams": [
+            {
+              "id": "ciclo-kalman",
+              "receipt": {
+                "ok": true,
+                "file": "/tmp/archify-explainer-check-zLBVoS/child.html",
+                "artifact": {
+                  "sha256": "cf3f6342446fb2e187f4a332666cd80b501eb5675de84fdb678e82ed4753e20f",
+                  "bytes": 837660
+                },
+                "checks": [
+                  {
+                    "name": "single_svg",
+                    "ok": true,
+                    "details": [
+                      "found 1 <svg> block(s)"
+                    ]
+                  },
+                  {
+                    "name": "finite_svg",
+                    "ok": true,
+                    "details": []
+                  },
+                  {
+                    "name": "orthogonal_arrows",
+                    "ok": true,
+                    "details": []
+                  },
+                  {
+                    "name": "label_route_clearance",
+                    "ok": true,
+                    "details": []
+                  },
+                  {
+                    "name": "relationship_crossings",
+                    "ok": true,
+                    "details": []
+                  },
+                  {
+                    "name": "relationship_corridors",
+                    "ok": true,
+                    "details": []
+                  },
+                  {
+                    "name": "container_border_runs",
+                    "ok": true,
+                    "details": []
+                  },
+                  {
+                    "name": "route_rhythm",
+                    "ok": true,
+                    "details": []
+                  },
+                  {
+                    "name": "legend_clearance",
+                    "ok": true,
+                    "details": []
+                  }
+                ],
+                "composition": {
+                  "schemaVersion": 1,
+                  "profile": "showcase",
+                  "status": "pass",
+                  "summary": {
+                    "errors": 0,
+                    "warnings": 0
+                  },
+                  "metrics": {
+                    "properCrossings": 0,
+                    "resolvedCrossovers": 0,
+                    "ambiguousCorridors": 0,
+                    "arrowheadCollisions": 0,
+                    "containerBorderRuns": 0,
+                    "labelRouteClearanceIssues": 0,
+                    "labelCanvasOverflowIssues": 0,
+                    "minLabelRouteClearance": 45.3,
+                    "desktopReadabilityIssues": 0,
+                    "viewportHeightIssues": 0,
+                    "minProjectedNodeTextPx": 6.520595968448729,
+                    "maxBends": 0,
+                    "routesOverSuggestedBends": 0,
+                    "maxStretch": 1,
+                    "routesOverSuggestedStretch": 0,
+                    "minSegmentPx": 8,
+                    "minInteriorSegmentPx": null,
+                    "shortSegmentCount": 1,
+                    "shortEndpointSegmentCount": 1,
+                    "shortInteriorSegmentCount": 0,
+                    "microSegmentCount": 0
+                  },
+                  "suggestedLimits": {
+                    "bendsPerRelationship": 2,
+                    "stretch": 1.35,
+                    "segmentPx": 16,
+                    "microSegmentPx": 8
+                  },
+                  "routeReview": {
+                    "crossings": [],
+                    "detours": []
+                  },
+                  "leadingSpace": {
+                    "measured": false,
+                    "reviewSuggested": false
+                  },
+                  "desktopReadability": {
+                    "budgetBasis": "legacy-930",
+                    "readerContract": "declared-wide-v1",
+                    "availableDiagramWidth": 930,
+                    "actualBudgetPx": 930,
+                    "limit": "legacy",
+                    "requestedTargetPx": null,
+                    "requestedTargetMet": null,
+                    "hardFloorPx": 6,
+                    "hardFloorMet": true,
+                    "minimumOwner": {
+                      "kind": "edge",
+                      "id": "correccion-to-prediccion-1",
+                      "from": "correccion",
+                      "to": "prediccion"
+                    },
+                    "minimumSourceTextPx": 8,
+                    "minimumProjectedTextPx": 6.520595968448729,
+                    "semanticTextCount": 11
+                  },
+                  "issues": []
+                }
+              }
+            }
+          ]
+        },
+        "diagnostics": [],
+        "provenance": "current",
+        "deliveryReceiptId": "5899367e-6095-4406-ad1c-43ef923b3d44"
+      }
+    }
+  },
+  "browserCheck": {
+    "requested": false,
+    "ran": false
+  },
+  "diagnostics": [],
+  "evidence": {
+    "receipt": "/home/angelrevelo/Documents/Brain-CanSAT/.archify/explainer-filtro-kalman-rumbo-20261122-140528/filtro-kalman-rumbo.finalize.json",
+    "summaryReceipt": "/home/angelrevelo/Documents/Brain-CanSAT/.archify/explainer-filtro-kalman-rumbo-20261122-140528/filtro-kalman-rumbo.finalize-summary.json"
+  },
+  "visualReview": "not-requested",
+  "finishedAt": "2026-11-22T19:18:27.782Z",
+  "durationMs": 3553,
+  "update": {
+    "status": "unavailable",
+    "installedVersion": null,
+    "availableVersion": null,
+    "releaseNotes": null,
+    "checkedAt": null,
+    "source": null,
+    "noticeRequired": false,
+    "noticeText": null,
+    "reason": "timeout"
+  }
+}
