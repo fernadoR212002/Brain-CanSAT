@@ -77,8 +77,9 @@ casosA = {'A0', 'servo 16 bits, 600 °/s, 0,5°',        16,  600, 0.5;
           'A2', 'servo 16 bits, 260 °/s, 2° (lento)',  16,  260, 2.0};
 
 load_system(fullfile(raiz, 'sim', [mdl '.slx']));
-if isempty(find_system(mdl, 'SearchDepth', 1, 'Regexp', 'on', 'Name', '^ACTUADOR PWM'))
-    error('sim/%s.slx no tiene el bloque ACTUADOR PWM: correr antes sim/simulink_lazo_camara_l3.m', mdl);
+if isempty(find_system(mdl, 'Regexp', 'on', 'Name', '^ACTUADOR PWM')) || ...
+   isempty(find_system(mdl, 'BlockType', 'Gain', 'Gain', 'DZ_HAT'))
+    error('sim/%s.slx no tiene el bloque ACTUADOR PWM con la compensación DZ_HAT: correr antes sim/simulink_lazo_camara_l3.m', mdl);
 end
 
 prm = struct('T', T, 'NSUB', NSUB, 'TF', TF, 'D2R', D2R, 'R2D', R2D, 'bias_g', bias_g, 'sig_g', sig_g, ...
@@ -101,7 +102,7 @@ for n = 1:2
         tt = out.e_deg.Time;  e = squeeze(out.e_deg.Data);  ec = squeeze(out.ec_deg.Data);
         u = squeeze(out.u_V.Data);  uap = squeeze(out.u_pwm_V.Data);
         sat = 100*mean(abs(u(tt >= 5)) >= UMAX - 1e-9);
-        met = metricas(tt, e, ec, u, uap, sat);
+        met = metricas(tt, e, ec, u, uap, sat, TF);
         filas(end+1, :) = [{'motor_rst_l3', cs, nom, esc, nb, udz, dzh, vb, vbh, NaN, NaN}, num2cell(met)]; %#ok<SAGROW>
         traza.(esc).(cs) = struct('t', tt, 'e', e, 'u', u, 'uap', uap);
     end
@@ -110,7 +111,7 @@ for n = 1:2
         [cs, nom, nb, vmax, db] = casosA{c, :};
         fprintf('Simulando %s %s (%s)...\n', esc, cs, nom);
         [tt, e, ec, tope] = sim_servo(psib_data(:, 2), wb_data(:, 2), nb, vmax*D2R, db*D2R, prm);
-        met = metricas(tt, e, ec, nan(size(tt)), nan(size(tt)), tope);
+        met = metricas(tt, e, ec, nan(size(tt)), nan(size(tt)), tope, TF);
         filas(end+1, :) = [{'servo_l0', cs, nom, esc, nb, NaN, NaN, NaN, NaN, vmax, db}, num2cell(met)]; %#ok<SAGROW>
         traza.(esc).(cs) = struct('t', tt, 'e', e);
     end
@@ -153,8 +154,8 @@ for sp = {{'B0', 'ideal'}, {'B1', '8 bits'}, {'B5', 'zona muerta 0,6 V'}}
     s = traza.S1.(sp{1}{1});  w = s.t >= 10 & s.t <= 12;
     stairs(ax, s.t(w), s.uap(w), 'Color', col.(sp{1}{1}), 'LineWidth', 1, 'DisplayName', [sp{1}{1} ' · ' sp{1}{2}]);
 end
-grid(ax, 'on'); xlabel(ax, 'Tiempo (s)'); ylabel(ax, 'Tensión aplicada al motor (V)');
-title(ax, 'B · Tensión que entrega el PWM · 2 s de S1');
+grid(ax, 'on'); xlabel(ax, 'Tiempo (s)'); ylabel(ax, 'Tensión efectiva sobre el motor (V)');
+title(ax, 'B · Tensión del PWM menos la zona muerta · 2 s de S1');
 legend(ax, 'Location', 'southoutside', 'Orientation', 'horizontal', 'Box', 'off');
 
 ax = nexttile(tl, 3);  hold(ax, 'on');
@@ -194,8 +195,13 @@ fprintf('Listo: derivados/tst-004-*.csv y salida/figuras/tst-004-pwm-actuador.pn
 
 
 %% ============================================================ funciones locales
-function met = metricas(tt, e, ec, u, uap, sat)
-% Mismas métricas que simulink_lazo_camara_l3.m, más el RMS de la tensión aplicada y la saturación.
+function met = metricas(tt, e, ec, u, uap, sat, TF)
+% Mismas métricas que simulink_lazo_camara_l3.m, más el RMS de la tensión efectiva y la saturación.
+% Tiempos redondeados a 1 µs y t < TF, para que Simulink (que registra también t = TF), el servo y
+% la réplica de Python usen las mismas 5300 muestras en la ventana de C8.
+tt = round(tt*1e6)/1e6;  k = tt < TF;
+tt = tt(k);  e = e(k);  ec = ec(k);  u = u(k);  uap = uap(k);
+if numel(sat) > 1, sat = sat(k); end
 m = (tt >= 5) & ~((tt >= 30) & (tt < 32));
 du = diff(u(tt >= 5));  dua = diff(uap(tt >= 5));
 if numel(sat) > 1, sat = 100*mean(sat(tt >= 5)); end

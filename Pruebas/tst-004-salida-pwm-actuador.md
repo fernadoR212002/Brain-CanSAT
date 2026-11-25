@@ -89,7 +89,7 @@ Máximo error real de la cámara fuera de la ventana de 30 a 32 s del giro de C1
 
 - **M1.** El caso ideal (B0) reproduce la réplica de Simulink del diseño: 3,01° en S1 y 2,60° en S2. Agregar el bloque PWM no cambió nada.
 - **M2.** La orden de L3 nunca pasa de 0,15 V en S1 ni de 0,12 V en S2 (B0, columna `u_max_V`). Confirma P1.
-- **M3.** Los bits del PWM casi no mueven el error: con 8, 10 y 11 bits, el máximo queda entre 2,57° y 3,08°. Con 8 bits, el RMS de los saltos de la tensión aplicada sube a 15,51 mV en S1 y 15,62 mV en S2, frente a 8,87 y 8,26 mV del caso ideal. Es el doble de actividad del motor para el mismo error.
+- **M3.** Los bits del PWM casi no mueven el error: con 8, 10 y 11 bits, el máximo queda entre 2,57° y 3,08°. Con 8 bits, el RMS de los saltos de la tensión sobre el motor sube a 15,50 mV en S1 y 15,63 mV en S2, frente a 8,87 y 8,26 mV del caso ideal. Es el doble de actividad del motor para el mismo error.
 - **M4.** Una batería de 6,4 V que el firmware cree de 7,4 V deja 3,22° y 2,67° (B6). Es la misma robustez ante el cambio de ganancia que M5 del diseño.
 - **M5.** **La zona muerta del motor es lo que rompe C8.**
   - Con 0,3 V sin compensar, S1 llega a 14,29° y pasa de 10° el 8,04 % del tiempo.
@@ -97,12 +97,19 @@ Máximo error real de la cámara fuera de la ventana de 30 a 32 s del giro de C1
   - El integrador del RST termina venciendo la zona muerta: la orden sube a 0,59 V y 1,02 V en S1. Pero cada cambio de sentido del balanceo vuelve a pasar por la zona muerta, y ahí el error crece.
   - En el giro continuo (S2), la orden casi no cambia de signo, y por eso el daño es menor.
 - **M6.** Compensar la zona muerta en el firmware la recupera: 0,5 V de compensación sobre 0,6 V reales deja 7,11° en S1 y 4,02° en S2 (B7). Cumple, pero en S1 gasta más de dos tercios de los 10°.
-- **M7.** Pasarse en la compensación (0,7 V sobre 0,6 V, B8) baja el error a 3,34° y 2,90°, pero el RMS de los saltos de tensión sube a 136,25 y 135,84 mV, unas 15 veces el caso ideal. El motor zumbaría: el signo cambia alrededor de cero y cada vez entrega el sobrante de 0,1 V.
+- **M7.** Pasarse en la compensación (0,7 V sobre 0,6 V, B8) baja el error a 3,34° y 2,90°, pero el RMS de los saltos de la tensión efectiva, después de la zona muerta, sube a 136,26 y 135,82 mV, unas 15 veces el caso ideal. El motor zumbaría: el signo cambia alrededor de cero y cada vez entrega el sobrante de 0,1 V.
 - **M8.** El servo de hobby de 180° con L0 no da en ningún caso: entre 66,04° y 69,73° en S1 y ≈ 180° en S2. La orden pide más de ±90° el 25,42 % del tiempo en S1, sobre todo después del giro de 90° de C11, y el 51,93 % en S2. Los bits (A1) y la velocidad del servo (A2) no cambian el veredicto. Falla por **recorrido**, no por el PWM. Es lo mismo que M4 del diseño y [RSK-001](../Riesgos/rsk-001-rango-servo-camara.md).
 - **M9.** Cruce entre MATLAB y Python:
   - las dos implementaciones dan el mismo veredicto en 23 de los 24 casos;
   - la excepción es B4 en S2: 7,59° en MATLAB y 10,64° en Python, donde solo el 0,06 % de las muestras pasa de 10°. Ese caso queda en el borde y depende del ruido: **no concluyente**;
-  - en el servo con S1, el máximo difiere (68,24° frente a 80,33°) porque el componente aleatorio del giro del cuerpo sale de generadores distintos. El tiempo sobre 10° casi coincide: 22,80 % y 21,45 %.
+  - la revisión de Codex del código de MATLAB no encontró errores de lógica. Sí encontró diferencias deterministas entre las réplicas, que son donde buscar si B4 en S2 importa:
+    - el observador de Simulink arranca sin ruido magnético;
+    - `perfil_cuerpo.m` normaliza S1 con `std` de n − 1, y Python con n;
+    - Simulink interpola $\alpha_b$ dentro de cada paso;
+    - los empates de redondeo del pulso se resuelven distinto.
+
+    Las métricas ya usan la misma ventana en las dos réplicas: t < 60 s, con 5300 muestras;
+  - en el servo con S1, el máximo difiere (68,24° frente a 80,33°) porque el componente aleatorio del giro del cuerpo sale de generadores distintos. El tiempo sobre 10° casi coincide: 22,79 % y 21,45 %.
 
 ### Veredicto de la simulación
 

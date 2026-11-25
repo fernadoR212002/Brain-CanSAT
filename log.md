@@ -256,3 +256,17 @@ El calendario de la guía sitúa el PDR a 70 días. Sigue abierto el riesgo alto
 ## 2026-11-25 · estado · TST-004 simulada; PDR en 64 días
 
 El servo de 180° no cumple C8. El motor con el RST sí cumple, si se compensa su zona muerta. Siguen abiertos un riesgo alto (RSK-002) y la matriz sin RQ ni RC. [Estado](estado.md)
+
+## 2026-11-25 · control · Revisión de Codex del código de MATLAB de TST-004
+
+- Codex revisó `tst_004_pwm_actuador.m`, el constructor de Simulink y `perfil_cuerpo.m`, sin ejecutar nada. No encontró errores de lógica: el anti-windup, el orden de la etapa PWM, el retorno de `solo_parametros` y las variables del workspace están bien.
+- Se corrigió:
+  1. la figura llamaba «tensión que entrega el PWM» a la tensión después de la zona muerta;
+  2. las métricas usan ahora t < 60 s, con tiempos redondeados, para que las dos réplicas cuenten las mismas 5300 muestras;
+  3. el script exige el bloque con la compensación `DZ_HAT`.
+- Solo cambian centésimas de algunos porcentajes y RMS. Ningún máximo ni veredicto cambia.
+- Las diferencias deterministas entre réplicas quedaron anotadas en TST-004·M9 como lugar donde buscar la discrepancia de B4 en S2:
+  - el arranque del observador;
+  - `std` con n − 1;
+  - la interpolación de α_b;
+  - los empates de redondeo.
