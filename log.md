@@ -231,3 +231,28 @@ El calendario de la guía sitúa el PDR a 70 días. Sigue abierto el riesgo alto
 - Explicación en una página (archify): [filtro-kalman-rumbo.html](.archify/explainer-filtro-kalman-rumbo-20261122-140528/filtro-kalman-rumbo.html). Figura: [filtro-kalman-rumbo.png](salida/figuras/filtro-kalman-rumbo.png).
 - **Pendiente:** el video de contexto que mencionó el líder no llegó con su enlace. Para sintonizar el filtro hacen falta los datos de [TST-002](Pruebas/tst-002-guia-datos-estacionarios-sensores.md) a 100 Hz: el ruido del giróscopo, la deriva del sesgo y el ruido del rumbo magnético.
 
+
+## 2026-11-25 · prueba · TST-004, salida PWM del ESP32 al actuador de la cámara
+
+- Pedido del líder: el ESP32 ya lee el giróscopo y el magnetómetro, y el control está en Simulink. Faltaba saber si la salida PWM al servo «da o no da», mirarlo en MATLAB y mostrar evidencia de que el RST funciona. Pidió trabajar con Codex y un diagrama del flujo con archify.
+- **Hallazgo de partida.** El RST L3 entrega voltaje, para un motor DC con puente H. Un servo de hobby recibe una posición por PWM, y su lazo interno decide el voltaje: ahí el RST no aplica y la ley es L0. Por eso se simularon los dos caminos.
+- **Trabajo entre dos agentes.**
+  - Claude agregó al modelo de Simulink el bloque «ACTUADOR PWM» (ideal por defecto) y escribió [tst_004_pwm_actuador.m](sim/tst_004_pwm_actuador.m).
+  - Codex escribió la réplica independiente [tst-004-pwm-actuador.py](sim/tst-004-pwm-actuador.py), con la misma especificación. Comprobó que su caso ideal reproduce `simulate()` muestra por muestra.
+  - Las dos implementaciones dan el mismo veredicto en 23 de 24 casos. B4 en S2 queda en el borde: 7,59° en MATLAB y 10,64° en Python.
+- **Regresión.** Con el bloque ideal, Simulink vuelve a dar 3,01° en S1 y 2,60° en S2, como M8 del diseño. El giro del cuerpo pasó a [perfil_cuerpo.m](sim/perfil_cuerpo.m), y el constructor acepta `solo_parametros`.
+- **Resultados** ([TST-004](Pruebas/tst-004-salida-pwm-actuador.md)):
+  - motor con el RST L3: cumple C8 con 8, 10 y 11 bits y con una batería sin medir;
+  - la orden nunca pasa de 0,15 V con $K_c$ = 30 rad/(s·V). Por eso una zona muerta del motor de 0,3 V sin compensar ya rompe C8 (14,29° en S1);
+  - compensando 0,5 V de 0,6 V queda en 7,11°; pasarse 0,1 V hace zumbar el motor (136 mV de RMS en los saltos de tensión);
+  - el servo de 180° con L0 falla por recorrido con cualquier resolución: entre 66° y 70° en S1, y ≈ 180° en S2.
+- Diagrama del flujo: [validacion-pwm-actuador.html](.archify/workflow-validacion-pwm-actuador-20261125-142605/validacion-pwm-actuador.html). Figura: [tst-004-pwm-actuador.png](salida/figuras/tst-004-pwm-actuador.png). Se agregaron la sección 11 del [diseño](Control/diseno-estabilizacion-camara.md) y M2 de [RSK-001](Riesgos/rsk-001-rango-servo-camara.md).
+- **Pendiente:**
+  - la parte de banco de TST-004: medir el PWM, la zona muerta, $K_c$ y $\tau_c$, y re-simular;
+  - DEC-001;
+  - procesar `Servos.pdf`;
+  - renovar la licencia de MATLAB, que según su aviso vence en 5 días.
+
+## 2026-11-25 · estado · TST-004 simulada; PDR en 64 días
+
+El servo de 180° no cumple C8. El motor con el RST sí cumple, si se compensa su zona muerta. Siguen abiertos un riesgo alto (RSK-002) y la matriz sin RQ ni RC. [Estado](estado.md)

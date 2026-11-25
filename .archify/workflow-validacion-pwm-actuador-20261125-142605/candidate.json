@@ -1,0 +1,315 @@
+{
+  "schema_version": 2,
+  "diagram_type": "workflow",
+  "meta": {
+    "title": "Validación de la salida PWM del ESP32 al actuador de la cámara",
+    "locale": "es",
+    "quality_profile": "showcase",
+    "output": ".archify/workflow-validacion-pwm-actuador-20261125-142605/validacion-pwm-actuador.html",
+    "legend": {
+      "entries": {
+        "external": {
+          "label": "Hardware de banco"
+        },
+        "backend": {
+          "label": "MATLAB y Simulink (Claude)"
+        },
+        "messagebus": {
+          "label": "Python (Codex)"
+        },
+        "security": {
+          "label": "Puerta de decisión"
+        },
+        "database": {
+          "label": "Brain: notas y evidencia"
+        }
+      }
+    }
+  },
+  "lanes": [
+    {
+      "id": "banco",
+      "label": "Banco: ESP32, BNO055 y actuador"
+    },
+    {
+      "id": "brain",
+      "label": "Brain"
+    },
+    {
+      "id": "matlab",
+      "label": "MATLAB y Simulink · Claude"
+    },
+    {
+      "id": "python",
+      "label": "Python · Codex"
+    }
+  ],
+  "phases": [
+    {
+      "id": "listo",
+      "label": "Ya está",
+      "fromCol": 0,
+      "toCol": 1
+    },
+    {
+      "id": "simulacion",
+      "label": "Simulación previa a dos agentes",
+      "fromCol": 2,
+      "toCol": 3,
+      "variant": "emphasis"
+    },
+    {
+      "id": "banco_fase",
+      "label": "Banco",
+      "fromCol": 4,
+      "toCol": 4,
+      "variant": "dashed"
+    },
+    {
+      "id": "veredicto",
+      "label": "Veredicto",
+      "fromCol": 5,
+      "toCol": 5
+    }
+  ],
+  "mainPath": [
+    "l3",
+    "actuador",
+    "etapa_pwm",
+    "cruce",
+    "tst",
+    "prueba_banco",
+    "evidencia",
+    "ajuste",
+    "resimular",
+    "dec"
+  ],
+  "nodes": [
+    {
+      "id": "esp",
+      "lane": "banco",
+      "col": 0,
+      "type": "external",
+      "label": "ESP32 + BNO055",
+      "sublabel": "giróscopo y magnetómetro leen",
+      "icon": "success"
+    },
+    {
+      "id": "prueba_banco",
+      "lane": "banco",
+      "col": 4,
+      "type": "external",
+      "label": "Prueba de banco",
+      "sublabel": "PWM medido y paso del actuador",
+      "tag": "TST-004"
+    },
+    {
+      "id": "tst",
+      "lane": "brain",
+      "col": 3,
+      "type": "database",
+      "label": "Nota TST-004",
+      "sublabel": "criterios ligados a C8 y C11"
+    },
+    {
+      "id": "evidencia",
+      "lane": "brain",
+      "col": 4,
+      "type": "database",
+      "label": "raw/pruebas",
+      "sublabel": "CSV del banco, tiempo en UTC"
+    },
+    {
+      "id": "dec",
+      "lane": "brain",
+      "col": 5,
+      "type": "database",
+      "label": "DEC-001",
+      "sublabel": "actuador y ley de control",
+      "icon": "flag"
+    },
+    {
+      "id": "l3",
+      "lane": "matlab",
+      "col": 0,
+      "type": "backend",
+      "label": "L3 en Simulink",
+      "sublabel": "RST + prealimentación",
+      "icon": "success"
+    },
+    {
+      "id": "actuador",
+      "lane": "matlab",
+      "col": 1,
+      "type": "security",
+      "label": "¿Qué recibe el PWM?",
+      "sublabel": "posición o ciclo útil",
+      "icon": "decision"
+    },
+    {
+      "id": "etapa_pwm",
+      "lane": "matlab",
+      "col": 2,
+      "type": "backend",
+      "label": "Etapa PWM",
+      "sublabel": "bits, 50 Hz, zona muerta, batería",
+      "tag": "B0–B8 · A0–A2"
+    },
+    {
+      "id": "cruce",
+      "lane": "matlab",
+      "col": 3,
+      "type": "security",
+      "label": "Cruce de números",
+      "sublabel": "¿Simulink ≈ Python?",
+      "icon": "decision"
+    },
+    {
+      "id": "ajuste",
+      "lane": "matlab",
+      "col": 4,
+      "type": "backend",
+      "label": "Ajuste del modelo",
+      "sublabel": "Kc y τc, o velocidad del servo"
+    },
+    {
+      "id": "resimular",
+      "lane": "matlab",
+      "col": 5,
+      "type": "backend",
+      "label": "Re-simular",
+      "sublabel": "con lo medido, contra C8"
+    },
+    {
+      "id": "replica",
+      "lane": "python",
+      "col": 2,
+      "type": "messagebus",
+      "label": "Réplica en Python",
+      "sublabel": "mismos casos, otro código"
+    }
+  ],
+  "edges": [
+    {
+      "id": "l3-actuador",
+      "from": "l3",
+      "to": "actuador",
+      "label": "u en voltios",
+      "variant": "emphasis"
+    },
+    {
+      "id": "actuador-etapa",
+      "from": "actuador",
+      "to": "etapa_pwm",
+      "label": "dos caminos",
+      "variant": "emphasis"
+    },
+    {
+      "id": "actuador-replica",
+      "from": "actuador",
+      "to": "replica",
+      "label": "misma especificación",
+      "variant": "dashed",
+      "role": "branch"
+    },
+    {
+      "id": "etapa-cruce",
+      "from": "etapa_pwm",
+      "to": "cruce",
+      "label": "métricas",
+      "variant": "emphasis"
+    },
+    {
+      "id": "replica-cruce",
+      "from": "replica",
+      "to": "cruce",
+      "label": "métricas",
+      "variant": "dashed"
+    },
+    {
+      "id": "cruce-tst",
+      "from": "cruce",
+      "to": "tst",
+      "label": "coinciden",
+      "variant": "emphasis"
+    },
+    {
+      "id": "tst-banco",
+      "from": "tst",
+      "to": "prueba_banco",
+      "label": "plan",
+      "variant": "emphasis"
+    },
+    {
+      "id": "esp-actuador",
+      "from": "esp",
+      "to": "actuador",
+      "label": "salida PWM",
+      "variant": "default",
+      "toSide": "top"
+    },
+    {
+      "id": "banco-evidencia",
+      "from": "prueba_banco",
+      "to": "evidencia",
+      "label": "datos crudos",
+      "variant": "emphasis"
+    },
+    {
+      "id": "evidencia-ajuste",
+      "from": "evidencia",
+      "to": "ajuste",
+      "label": "lee raw/",
+      "variant": "emphasis"
+    },
+    {
+      "id": "ajuste-resimular",
+      "from": "ajuste",
+      "to": "resimular",
+      "label": "planta medida",
+      "variant": "emphasis"
+    },
+    {
+      "id": "resimular-dec",
+      "from": "resimular",
+      "to": "dec",
+      "label": "da o no da",
+      "variant": "emphasis"
+    }
+  ],
+  "cards": [
+    {
+      "dot": "amber",
+      "title": "Por qué hay dos caminos",
+      "items": [
+        "El RST L3 entrega voltaje: sirve para un motor DC con puente H, donde el PWM es el ciclo útil d = u/Vbat.",
+        "Un servo de hobby recibe una posición y la sigue con su propio lazo: ahí el RST no aplica y se usa L0."
+      ]
+    },
+    {
+      "dot": "cyan",
+      "title": "Qué se simula",
+      "items": [
+        "Motor (B0–B8): ideal; 8, 10 y 11 bits; zona muerta de 0,3 y 0,6 V, con y sin compensación; batería de 6,4 V sin medir.",
+        "Servo (A0–A2): pulso de 0,6 a 2,4 ms a 50 Hz con 16 u 8 bits; 600 o 260 °/s."
+      ]
+    },
+    {
+      "dot": "emerald",
+      "title": "Resultado de la simulación (TST-004)",
+      "items": [
+        "Motor + RST L3: cumple C8 con 8 a 11 bits de PWM; una zona muerta de 0,3 V sin compensar lo rompe (14,29° en S1).",
+        "Compensar la zona muerta en el firmware lo recupera; el servo de 180° con L0 falla por recorrido (66–70° en S1, ≈ 180° en S2).",
+        "MATLAB y Python dan el mismo veredicto en 23 de 24 casos; B4 en S2 queda en el borde."
+      ]
+    },
+    {
+      "dot": "rose",
+      "title": "Criterio",
+      "items": [
+        "C8: |ψc − ψref| < 10° fuera de la ventana del giro de 90° de C11.",
+        "Simulado no es verificado: el veredicto sale del banco, con los datos en raw/."
+      ]
+    }
+  ]
+}

@@ -196,7 +196,7 @@ Datos en [diseno-estabilizacion-camara-identificabilidad.csv](../derivados/disen
 | rojo | perturbación | giro del cuerpo $\psi_b$, $\omega_b$, $\alpha_b$ (S4) |
 | azul | controlador | RST con integrador ($T$, $S$, $R$) y anti-windup ($u-u_{ff}$ realimentada) |
 | cian | prealimentación | $u_{ff}=-\hat\omega_b/K_c$ |
-| naranja | actuador | saturación de ±6 V |
+| naranja | actuador | saturación de ±6 V y PWM del ESP32 (ideal aquí; sección 11) |
 | magenta | planta | motor + cámara en espacio de estados, $\psi_c=\psi_b+\theta_g$ |
 | amarillo | sensores | giróscopo (latencia, sesgo, ruido, 16 LSB por °/s), magnetómetro (calibración, inclinación, ruido) y codificador de 12 bits |
 | violeta | estimador | observador $(\psi_b, b_g)$ y $\hat\psi_c=\hat\psi_b+\theta_{enc}$ |
@@ -212,10 +212,19 @@ Datos en [diseno-estabilizacion-camara-identificabilidad.csv](../derivados/disen
 3. Para simular otra vez desde el modelo, pulsar Run en Simulink: usa las variables del workspace. Los osciloscopios grises muestran el error y la tensión $u$.
 4. Para cambiar el escenario: `escenario = 'S1'; run('sim/simulink_lazo_camara_l3.m')`. Para cambiar la planta real sin rediseñar el control: cambiar `Kc` o `tau` en el workspace y pulsar Run. El RST conserva el diseño hecho con los valores del script.
 
+## 11. Salida PWM del ESP32 al actuador (TST-004)
+
+El modelo de Simulink tiene un bloque naranja «ACTUADOR PWM» entre la saturación y la planta. En la sección 10 queda ideal. [TST-004](../Pruebas/tst-004-salida-pwm-actuador.md) lo varía, y Codex lo cruzó con una réplica en Python. Lo que cambia en este diseño:
+
+- **M9.** Con el motor DC y el puente H, L3 sigue cumpliendo C8 con 8, 10 u 11 bits de PWM y con una batería que no se mide. Lo que lo rompe es la zona muerta del motor: con 0,3 V sin compensar, S1 llega a 14,29°. Compensándola en el firmware ($u+\hat u_{dz}\,\mathrm{sign}(u)$) se recupera (TST-004·M5, M6). La causa es que L3 pide como máximo 0,15 V con $K_c=30$ rad/(s·V) (TST-004·M2).
+- **M10.** El servo de hobby de 180° con L0 vuelve a fallar por recorrido, con cualquier resolución de pulso (TST-004·M8). Confirma M4 y [RSK-001](../Riesgos/rsk-001-rango-servo-camara.md).
+- Para DEC-001 hay que sumar dos criterios: la zona muerta medida del motor y la reducción. Más reducción baja $K_c$ y sube la tensión de trabajo frente a la zona muerta (TST-004·P2).
+
 ## Cómo se reproduce
 
 ```bash
 python3 -m pip install -r sim/requirements.txt
 python3 sim/diseno-estabilizacion-camara.py     # ≈ 1 min; imprime las tablas y escribe los CSV y la figura
 matlab -batch "run('sim/simulink_lazo_camara_l3.m')"   # réplica de L3 en Simulink (sección 10)
+matlab -batch "run('sim/tst_004_pwm_actuador.m')"      # salida PWM al actuador (sección 11, TST-004)
 ```
