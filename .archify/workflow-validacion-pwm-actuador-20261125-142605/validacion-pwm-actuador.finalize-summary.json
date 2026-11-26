@@ -1,0 +1,54 @@
+{
+  "schemaVersion": 1,
+  "ok": true,
+  "command": "finalize",
+  "status": "pass",
+  "type": "workflow",
+  "quality": "showcase",
+  "specification": {
+    "path": "/home/angelrevelo/Documents/Brain-CanSAT/.archify/workflow-validacion-pwm-actuador-20261125-142605/candidate.json",
+    "sha256": "88fb1bbee6f3f62e95b000d75b50a4a05a76606f7c4719193dd2b002e643c6dc",
+    "bytes": 6816
+  },
+  "artifact": {
+    "path": "/home/angelrevelo/Documents/Brain-CanSAT/.archify/workflow-validacion-pwm-actuador-20261125-142605/validacion-pwm-actuador.html",
+    "sha256": "65c2ab1175420d5eac58dd0223e81e6c074bf3fcbfbc8cb119fb0f45282e5f2b",
+    "bytes": 856864
+  },
+  "gates": {
+    "validate": "pass",
+    "deliver": "pass",
+    "check": "pass",
+    "browser-check": "pass"
+  },
+  "diagnostics": [],
+  "diagnosticSummary": {
+    "total": 0,
+    "shown": 0,
+    "truncated": false
+  },
+  "evidence": {
+    "receipt": "/home/angelrevelo/Documents/Brain-CanSAT/.archify/workflow-validacion-pwm-actuador-20261125-142605/validacion-pwm-actuador.finalize.json",
+    "summaryReceipt": "/home/angelrevelo/Documents/Brain-CanSAT/.archify/workflow-validacion-pwm-actuador-20261125-142605/validacion-pwm-actuador.finalize-summary.json",
+    "browserCheckReceipt": "/home/angelrevelo/Documents/Brain-CanSAT/.archify/workflow-validacion-pwm-actuador-20261125-142605/validacion-pwm-actuador.browser-check.json"
+  },
+  "update": {
+    "status": "update_available",
+    "installedVersion": "3.2.0",
+    "availableVersion": "3.3.1",
+    "releaseNotes": "https://github.com/tt-a1i/archify/releases/tag/v3.3.1",
+    "severity": "normal",
+    "summary": "Polishes automatic Architecture layout, spine labels, crossing reduction, and Classic styling, and deduplicates cited Explainer files.",
+    "checkedAt": "2026-11-25T19:26:59.604Z",
+    "source": "cache",
+    "noticeRequired": true,
+    "noticeText": "Archify update: 3.2.0 → 3.3.1. A previous check at 2026-11-25T19:26:59.604Z found a newer release. Release notes: https://github.com/tt-a1i/archify/releases/tag/v3.3.1. Would you like me to update Archify?",
+    "eventKey": "archify@sha256:b92b4d55446966fd74e5338a45d6de9a7a1b194420cd5eb14d2cdc39f1053b80"
+  },
+  "visualReview": "not-requested",
+  "durationMs": 14050,
+  "browserCheck": {
+    "requested": true,
+    "ran": true
+  }
+}

@@ -1,0 +1,17 @@
+{
+  "schemaVersion": 1,
+  "receiptId": "6ba1adc3-bad5-40a2-bca1-015ad24e88a7",
+  "status": "current",
+  "command": "deliver",
+  "type": "workflow",
+  "input": "/home/angelrevelo/Documents/Brain-CanSAT/.archify/workflow-validacion-pwm-actuador-20261125-142605/candidate.json",
+  "output": "/home/angelrevelo/Documents/Brain-CanSAT/.archify/workflow-validacion-pwm-actuador-20261125-142605/validacion-pwm-actuador.html",
+  "specification": {
+    "sha256": "4b91e677af6c2544f062f82ed2fbdc487e30c2ce583152c47c463655758f733e",
+    "bytes": 7326
+  },
+  "artifact": {
+    "sha256": "8848ff717bb3a17220e8c5c764a17b1441460f2f651c61f57597a155b2cb86ed",
+    "bytes": 857500
+  }
+}

@@ -1,0 +1,127 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Que el suelo no gire · Antares · CanSat 2027</title>
+<style>
+*{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;background:#172120;color:#f3ead4;font-family:Inter,Arial,sans-serif}body{display:grid;place-items:center}main{width:min(100vw,177.777778vh);aspect-ratio:16/9;position:relative}canvas{display:block;width:100%;height:100%}button{position:fixed;bottom:12px;right:14px;border:1px solid #f3ead4;border-radius:20px;padding:7px 18px;background:#172120;color:#f3ead4;font:600 14px system-ui;cursor:pointer}button[hidden]{display:none}
+</style>
+</head><body>
+<main id="film" data-composition-id="antares" data-start="0" data-duration="15" data-width="1920" data-height="1080" data-fps="60">
+<canvas id="poster" width="1920" height="1080" role="img" aria-label="Antares, CanSat 2027. Luis Edmundo Parra obtiene señales del BNO055 con ESP32 y MATLAB. Angel Fernando Revelo Narvaez dirige el equipo de control y modela la estabilización de cámara. Errores máximos simulados de 3,01 y 2,60 grados."></canvas>
+<audio id="score" data-start="0" data-duration="15" data-track-index="1" preload="auto" src="score.m4a"></audio>
+</main><button id="play" type="button" hidden>Reproducir con sonido</button>
+<script>
+'use strict';
+const canvas=document.querySelector('#poster'), ctx=canvas.getContext('2d');
+const paper='#f3ead4', ink='#172120', red='#b63320', lime='#c8e67c', pale='#b8b4a3';
+const sans='Inter, Arial, sans-serif', mono='"DejaVu Sans Mono", monospace';
+const bench=new Image(); bench.src='magnetometro.webp';
+const tau=Math.PI*2;
+function clamp(x){return Math.max(0,Math.min(1,x))}
+function ease(x){return 1-Math.pow(1-clamp(x),3)}
+function rect(x,y,w,h,color){ctx.fillStyle=color;ctx.fillRect(x,y,w,h)}
+function circle(x,y,r,color){ctx.beginPath();ctx.arc(x,y,r,0,tau);ctx.fillStyle=color;ctx.fill()}
+function arc(x,y,r,a,b,color,width=4){ctx.beginPath();ctx.arc(x,y,r,a,b);ctx.strokeStyle=color;ctx.lineWidth=width;ctx.stroke()}
+function line(x,y,xx,yy,color,width=3){ctx.beginPath();ctx.moveTo(x,y);ctx.lineTo(xx,yy);ctx.strokeStyle=color;ctx.lineWidth=width;ctx.stroke()}
+function poly(points,color,stroke='',w=3){ctx.beginPath();points.forEach(([x,y],i)=>i?ctx.lineTo(x,y):ctx.moveTo(x,y));ctx.closePath();if(color){ctx.fillStyle=color;ctx.fill()}if(stroke){ctx.strokeStyle=stroke;ctx.lineWidth=w;ctx.stroke()}}
+function type(str,x,y,size,color=ink,weight=700,family=sans,maxWidth=1850){ctx.fillStyle=color;ctx.font=weight+' '+size+'px '+family;ctx.fillText(str,x,y,maxWidth)}
+function label(str,x,y,color=ink,size=26){type(str,x,y,size,color,500,mono)}
+function star(x,y,s,col){poly([[x,y-s],[x+s*.19,y-s*.18],[x+s,y],[x+s*.19,y+s*.18],[x,y+s],[x-s*.19,y+s*.18],[x-s,y],[x-s*.19,y-s*.18]],col)}
+function enter(age,delay,fn){const p=ease((age-delay)/.44);if(!p)return;ctx.save();ctx.globalAlpha*=p;ctx.translate(0,32*(1-p));fn();ctx.restore()}
+function grid(x,y,w,h,step,color){ctx.save();ctx.beginPath();ctx.rect(x,y,w,h);ctx.clip();for(let i=0;i<w;i+=step)line(x+i,y,x+i,y+h,color,1);for(let i=0;i<h;i+=step)line(x,y+i,x+w,y+i,color,1);ctx.restore()}
+function header(dark){const c=dark?paper:ink;star(93,77,26,dark?lime:red);type('ANTARES',134,94,47,c,900);type('CanSat Competition 2027',1350,92,36,c,600,sans,500);line(68,128,1852,128,c,3)}
+function footer(dark,tag){const c=dark?paper:ink;line(68,931,1852,931,c,2);label('DIRECCIÓN DEL EQUIPO DE CONTROL',68,973,c,23);type('Angel Fernando Revelo Narvaez',68,1031,45,c,850);label(tag,1300,1010,c,27)}
+// Perspective sketch of the suspended body, with a separately driven lens.
+function bodySketch(x,y,scale,angle,lensAngle){
+ ctx.save();ctx.translate(x,y);ctx.scale(scale,scale);
+ const project=(a,b,z)=>[(a*Math.cos(angle)-b*Math.sin(angle)),(a*Math.sin(angle)+b*Math.cos(angle))*.32-z];
+ const square=[[-82,-82],[82,-82],[82,82],[-82,82]];
+ for(const i of [0,1,2,3].sort((i,j)=>project(...square[i],0)[1]-project(...square[j],0)[1])){
+  const j=(i+1)%4;
+  poly([project(...square[i],60),project(...square[j],60),project(...square[j],-57),project(...square[i],-57)],i%2?'#52645d':ink,paper,3.5);
+ }
+ poly(square.map(v=>project(...v,60)),paper,ink,4);
+ for(let i=-55;i<=55;i+=22){const a=project(i,-72,61),b=project(i,72,61);line(...a,...b,ink,2)}
+ ctx.save();ctx.translate(0,65);ctx.scale(1,.52);circle(0,0,54,ink);arc(0,0,44,0,tau,lime,8);ctx.rotate(lensAngle);line(0,0,38,0,lime,7);circle(0,0,11,paper);ctx.restore();ctx.restore()
+}
+function opening(a){
+ rect(0,0,1920,1080,paper);header(false);footer(false,'ESTABILIZACIÓN DE VIDEO');
+ const cx=1430;circle(cx,516,350,red);
+ ctx.save();ctx.beginPath();ctx.arc(cx,516,350,0,tau);ctx.clip();
+ for(let n=0;n<24;n++)line(947+n*38,870,1145+n*38,705,'#912d20',2);
+ ctx.restore();
+ // Three canopy gores and suspension lines, scaled up like a printed technical plate.
+ const sway=12*Math.sin(a*1.8), vx=cx+sway, top=313;
+ ctx.save();ctx.translate(vx,top);ctx.beginPath();ctx.moveTo(-215,83);ctx.bezierCurveTo(-170,-120,165,-150,219,60);ctx.quadraticCurveTo(177,30,142,73);ctx.quadraticCurveTo(76,40,49,87);ctx.quadraticCurveTo(-17,55,-47,95);ctx.quadraticCurveTo(-112,66,-151,102);ctx.quadraticCurveTo(-180,82,-215,83);ctx.closePath();ctx.fillStyle=paper;ctx.fill();
+ for(const xx of [-150,-48,49,142]){ctx.beginPath();ctx.moveTo(-4,-77);ctx.quadraticCurveTo(xx*.88,-48,xx,xx<0?93:76);ctx.strokeStyle=red;ctx.lineWidth=4;ctx.stroke()}
+ for(const [xx,yy] of [[-214,83],[-151,101],[-47,94],[49,87],[142,73],[218,60]])line(xx,yy,xx*.16,290,paper,3);
+ ctx.restore();bodySketch(vx,top+320,1.08,a*1.35+.3,a*1.35);
+ arc(cx,729,90,.14,2.65,paper,5);poly([[1345,763],[1365,763],[1356,744]],paper);
+ enter(a+.12,0,()=>{label('CONTROL DE RUMBO',72,241,red);type('Que el suelo',64,460,146,ink,900,sans,1005);type('no gire.',62,649,193,red,900,sans,1000)});
+ enter(a,.24,()=>{line(75,727,173,727,ink,8);type('Una cámara bajo un paracaídas que gira.',72,805,44,ink,550,sans,1000)});
+}
+function hardware(a){
+ rect(0,0,1920,1080,ink);header(true);footer(true,'PRUEBA EN BANCO');
+ enter(a,0,()=>{label('ADQUISICIÓN EN BANCO',74,246,lime);type('Medir',65,445,160,paper,900);type('el giro.',62,615,164,paper,900);type('Luis Edmundo Parra',72,754,59,lime,800);label('HARDWARE',74,811,paper)});
+ const xx=889,yy=265;enter(a,.07,()=>{
+  rect(xx,yy,955,481,paper);label('BNO055  /  MAGNETÓMETRO',xx+35,yy+56,ink,25);
+  line(xx+32,yy+84,xx+922,yy+84,ink,2);
+  if(bench.complete&&bench.naturalWidth)ctx.drawImage(bench,xx+33,yy+138,888,192);
+  const pos=xx+34+888*clamp((a-.1)/2.45);line(pos,yy+115,pos,yy+338,red,4);
+  label('CAPTURA ORIGINAL DE MATLAB',xx+33,yy+425,ink,23);
+ });
+ enter(a,.19,()=>{type('BNO055   →   ESP32   →   MATLAB',xx,841,46,paper,750,sans,950)});
+}
+function control(a){
+ rect(0,0,1920,1080,paper);header(false);footer(false,'MODELO EN SIMULINK');
+ enter(a,0,()=>{label('DISEÑO DEL CONTROL',74,233,red);type('Compensar',62,408,135,ink,900,sans,950);type('el giro.',62,566,159,red,900);type('El giróscopo anticipa el giro.',72,685,47,ink,650);type('El controlador corrige el error.',72,752,47,ink,650);label('RST + PREALIMENTACIÓN',75,845,red,27)});
+ const cx=1438,cy=522;
+ enter(a,.04,()=>{grid(1020,184,815,682,47,'#d7d0bd');circle(cx,cy,248,ink);
+ for(let k=0;k<48;k++){let v=k*tau/48;let r=(k%4===0?218:232);line(cx+Math.cos(v)*r,cy+Math.sin(v)*r,cx+Math.cos(v)*241,cy+Math.sin(v)*241,k%4===0?paper:'#81938a',k%4===0?3:2)}
+ const phi=.37+1.06*a;ctx.save();ctx.translate(cx,cy);ctx.rotate(phi);poly([[-112,-112],[112,-112],[112,112],[-112,112]],'#344640',paper,5);
+ for(const sign of [-1,1])for(let y=-80;y<=80;y+=32){line(sign*78,y,sign*98,y,paper,4)}ctx.restore();
+ circle(cx,cy,77,ink);arc(cx,cy,68,0,tau,lime,7);poly([[cx,cy-108],[cx-18,cy-53],[cx+18,cy-53]],lime);
+ line(cx,cy-66,cx,cy-15,lime,4);circle(cx,cy,16,lime);circle(cx,cy,7,ink);
+ arc(cx,cy,272,phi,phi+1.12,red,9);
+ label('RUMBO DE CÁMARA',cx-145,211,ink,26);line(cx,227,cx,260,ink,3);
+ type('Cuerpo',1158,850,36,red,750);rect(1118,827,23,23,red);type('Cámara',1480,850,36,ink,750);rect(1441,824,26,26,ink);rect(1446,829,16,16,lime);
+ });
+}
+function results(a){
+ rect(0,0,1920,1080,red);header(true);footer(true,'SIMULACIÓN  /  L3');
+ enter(a,0,()=>{label('RESULTADO EN SIMULINK',74,238,paper);type('Error máximo de rumbo',65,404,117,paper,900,sans,1765)});
+ const values=[['3,01°','S1   OSCILACIÓN',3.01],['2,60°','S2   GIRO CONTINUO',2.60]];
+ values.forEach(([val,name,num],i)=>{const x=74+i*900;enter(a,.08+i*.12,()=>{
+ label(name,x,510,paper,30);type(val,x-8,710,195,paper,900,sans,820);
+ rect(x,761,753,12,'#812d21');rect(x,761,753*num/10*ease((a-.16-i*.11)/.8),12,lime);line(x+753,750,x+753,784,paper,3)
+ })});
+ enter(a,.28,()=>type('Límite de misión ±10°  ·  Se excluyen el arranque y la maniobra de 90°.',75,870,39,paper,580,sans,1760));
+}
+const scenes=[opening,hardware,control,results], starts=[0,3,6,10.6];
+function draw(seconds){
+ const t=Math.max(0,Math.min(15,seconds));let i=starts.findLastIndex(start=>start<=t),age=t-starts[i];
+ // The incoming sheet crosses the drawing board on a diagonal.
+ if(i>0&&age<.38){
+  scenes[i-1](t-starts[i-1]);const p=clamp(age/.38);const q=p*p*(3-2*p),edge=-430+q*2410;
+  ctx.save();ctx.beginPath();ctx.moveTo(0,0);ctx.lineTo(edge+410,0);ctx.lineTo(edge,1080);ctx.lineTo(0,1080);ctx.closePath();ctx.clip();scenes[i](age);ctx.restore();
+  line(edge+410,0,edge,1080,i===3?lime:red,14);
+ }else scenes[i](age);
+}
+window.antaresFrame=draw;draw(0);
+</script>
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.15.1/dist/gsap.min.js"></script>
+<script>
+const clock={set position(seconds){draw(seconds)},get position(){return 0}};
+if(window.gsap){
+ const tl=gsap.timeline({paused:true});
+ tl.fromTo(clock,{position:0},{position:15,ease:'none',duration:15},0);
+ window.__timelines=window.__timelines||{};window.__timelines.antares=tl;
+}
+</script>
+<script>
+if(location.protocol==='file:'||new URLSearchParams(location.search).has('play')){
+ const playerScript=document.createElement('script');playerScript.src='player.js';document.body.appendChild(playerScript);
+}
+</script>
+</body></html>

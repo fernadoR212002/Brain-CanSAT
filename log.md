@@ -203,3 +203,70 @@ Diario del brain. **Solo crece:** cada entrada se agrega al final con el encabez
 - [exportar-presentacion.py](scripts/exportar-presentacion.py) ya no agrega la nota «Versión de un solo archivo…». [presentacion-control-camara.html](salida/presentacion-control-camara.html) quedó regenerado.
 - Se mantienen el cierre con el recovery, que pidió el líder, las etiquetas de ilustración y los «≈» de los valores leídos de las capturas.
 - El Artifact quedó en la versión 2, con el mismo enlace. Lo que falta sigue registrado en el brain: los CSV de TST-003 están en el punto 8 de [estado.md](estado.md).
+
+## 2026-11-19 · salida · Animación del control de la cámara para Antares
+
+Angel Fernando Revelo Narvaez pidió una pieza de 15 s para el equipo de la competencia CanSat 2027 y señaló los créditos de dirección del equipo de control y de hardware. La [composición HyperFrames](salida/antares-control-15s/index.html) retoma el trabajo de Luis Parra con el [BNO055 y el ESP32](Pruebas/tst-003-bno055-sin-calibrar-esp32-matlab.md) y el [diseño de control y sus resultados en Simulink](Control/diseno-estabilizacion-camara.md).
+
+Se verificó el [MP4](salida/antares-control-15s.mp4) de 1920 × 1080 a 60 fps, con 900 fotogramas, 15 s y sonido original.
+
+## 2026-11-19 · estado · Avance de control para el PDR
+
+El calendario de la guía sitúa el PDR a 70 días. Sigue abierto el riesgo alto de calibración del magnetómetro y la matriz espera sus primeros RQ y RC. [Estado](estado.md)
+
+## 2026-11-22 · control · Filtro de Kalman del rumbo frente al complementario
+
+- Pedido del líder: entender el filtro de Kalman a partir de las señales del brain, sin abreviaciones, como base para unas diapositivas que justifiquen la prueba con el equipo. La idea venía de la presentación del control: «si no alcanza, evaluamos un filtro de Kalman».
+- Trabajo entre dos agentes. Codex escribió [filtro-kalman-rumbo.py](sim/filtro-kalman-rumbo.py) con las señales y los supuestos de `diseno-estabilizacion-camara.py`. Claude verificó por su lado la ganancia estacionaria, por iteración directa de la Riccati, y las dos coincidieron. Codex revisó luego las correcciones de Claude.
+- Correcciones de la revisión cruzada:
+  1. Claude: el giróscopo y el magnetómetro llegan con una muestra de retraso. Hay que corregir con la lectura retrasada y después predecir hasta el instante actual. En el orden inverso, el retraso de ≈ 0,9° del giro continuo de S2 cancelaba por casualidad el +1,5° del magnetómetro y hacía ver al Kalman mejor.
+  2. Claude: la métrica de convergencia del sesgo, con una banda de 0,05 °/s, dependía del ruido. Se cambió por el error del sesgo a los 2 s y a los 5 s.
+  3. Codex: las filas 0 y 1 describen el mismo instante, así que el Kalman no predice en la fila 0. El complementario conserva ese detalle de `simulate()`, y en régimen no influye.
+- Resultados con los supuestos de ruido del brain (todavía sin medidas):
+  - en régimen es casi igual al complementario: 1,50° frente a 1,55° de error cuadrático medio en S2 y 1,55° frente a 1,60° en S1. Su ganancia estacionaria equivale a un complementario de 0,33 rad/s con ζ = 0,73; el actual es de 0,5 rad/s con ζ = 0,7;
+  - con el error magnético como ruido blanco, aprende el sesgo antes: 0,16 °/s de error a los 2 s, frente a 0,53;
+  - con el residuo de calibración y la inclinación que oscila, se sobrerreacciona al arrancar: 1,82 °/s frente a 0,42. Vale lo que valga su modelo del ruido;
+  - con una compuerta de 3 desviaciones de la innovación, una lectura magnética corrida 20° durante 3 s deja 1,87° de error, frente a 24,66° del complementario;
+  - no corrige un desfase fijo del magnetómetro: con estos sensores no es observable. [RSK-002](Riesgos/rsk-002-calibracion-magnetometro.md) sigue siendo la ruta crítica.
+- Explicación en una página (archify): [filtro-kalman-rumbo.html](.archify/explainer-filtro-kalman-rumbo-20261122-140528/filtro-kalman-rumbo.html). Figura: [filtro-kalman-rumbo.png](salida/figuras/filtro-kalman-rumbo.png).
+- **Pendiente:** el video de contexto que mencionó el líder no llegó con su enlace. Para sintonizar el filtro hacen falta los datos de [TST-002](Pruebas/tst-002-guia-datos-estacionarios-sensores.md) a 100 Hz: el ruido del giróscopo, la deriva del sesgo y el ruido del rumbo magnético.
+
+
+## 2026-11-25 · prueba · TST-004, salida PWM del ESP32 al actuador de la cámara
+
+- Pedido del líder: el ESP32 ya lee el giróscopo y el magnetómetro, y el control está en Simulink. Faltaba saber si la salida PWM al servo «da o no da», mirarlo en MATLAB y mostrar evidencia de que el RST funciona. Pidió trabajar con Codex y un diagrama del flujo con archify.
+- **Hallazgo de partida.** El RST L3 entrega voltaje, para un motor DC con puente H. Un servo de hobby recibe una posición por PWM, y su lazo interno decide el voltaje: ahí el RST no aplica y la ley es L0. Por eso se simularon los dos caminos.
+- **Trabajo entre dos agentes.**
+  - Claude agregó al modelo de Simulink el bloque «ACTUADOR PWM» (ideal por defecto) y escribió [tst_004_pwm_actuador.m](sim/tst_004_pwm_actuador.m).
+  - Codex escribió la réplica independiente [tst-004-pwm-actuador.py](sim/tst-004-pwm-actuador.py), con la misma especificación. Comprobó que su caso ideal reproduce `simulate()` muestra por muestra.
+  - Las dos implementaciones dan el mismo veredicto en 23 de 24 casos. B4 en S2 queda en el borde: 7,59° en MATLAB y 10,64° en Python.
+- **Regresión.** Con el bloque ideal, Simulink vuelve a dar 3,01° en S1 y 2,60° en S2, como M8 del diseño. El giro del cuerpo pasó a [perfil_cuerpo.m](sim/perfil_cuerpo.m), y el constructor acepta `solo_parametros`.
+- **Resultados** ([TST-004](Pruebas/tst-004-salida-pwm-actuador.md)):
+  - motor con el RST L3: cumple C8 con 8, 10 y 11 bits y con una batería sin medir;
+  - la orden nunca pasa de 0,15 V con $K_c$ = 30 rad/(s·V). Por eso una zona muerta del motor de 0,3 V sin compensar ya rompe C8 (14,29° en S1);
+  - compensando 0,5 V de 0,6 V queda en 7,11°; pasarse 0,1 V hace zumbar el motor (136 mV de RMS en los saltos de tensión);
+  - el servo de 180° con L0 falla por recorrido con cualquier resolución: entre 66° y 70° en S1, y ≈ 180° en S2.
+- Diagrama del flujo: [validacion-pwm-actuador.html](.archify/workflow-validacion-pwm-actuador-20261125-142605/validacion-pwm-actuador.html). Figura: [tst-004-pwm-actuador.png](salida/figuras/tst-004-pwm-actuador.png). Se agregaron la sección 11 del [diseño](Control/diseno-estabilizacion-camara.md) y M2 de [RSK-001](Riesgos/rsk-001-rango-servo-camara.md).
+- **Pendiente:**
+  - la parte de banco de TST-004: medir el PWM, la zona muerta, $K_c$ y $\tau_c$, y re-simular;
+  - DEC-001;
+  - procesar `Servos.pdf`;
+  - renovar la licencia de MATLAB, que según su aviso vence en 5 días.
+
+## 2026-11-25 · estado · TST-004 simulada; PDR en 64 días
+
+El servo de 180° no cumple C8. El motor con el RST sí cumple, si se compensa su zona muerta. Siguen abiertos un riesgo alto (RSK-002) y la matriz sin RQ ni RC. [Estado](estado.md)
+
+## 2026-11-25 · control · Revisión de Codex del código de MATLAB de TST-004
+
+- Codex revisó `tst_004_pwm_actuador.m`, el constructor de Simulink y `perfil_cuerpo.m`, sin ejecutar nada. No encontró errores de lógica: el anti-windup, el orden de la etapa PWM, el retorno de `solo_parametros` y las variables del workspace están bien.
+- Se corrigió:
+  1. la figura llamaba «tensión que entrega el PWM» a la tensión después de la zona muerta;
+  2. las métricas usan ahora t < 60 s, con tiempos redondeados, para que las dos réplicas cuenten las mismas 5300 muestras;
+  3. el script exige el bloque con la compensación `DZ_HAT`.
+- Solo cambian centésimas de algunos porcentajes y RMS. Ningún máximo ni veredicto cambia.
+- Las diferencias deterministas entre réplicas quedaron anotadas en TST-004·M9 como lugar donde buscar la discrepancia de B4 en S2:
+  - el arranque del observador;
+  - `std` con n − 1;
+  - la interpolación de α_b;
+  - los empates de redondeo.

@@ -23,10 +23,20 @@
 %   verde = referencia · rojo = perturbación (giro del cuerpo) · azul = controlador RST
 %   cian = prealimentación · naranja = actuador · magenta = planta · amarillo = sensores
 %   violeta = estimador de rumbo · gris = medición y salidas
+%
+% Etapa PWM del ESP32 (bloque naranja «ACTUADOR PWM», TST-004): compensación de zona muerta
+% u + DZ_HAT·sign(u), ciclo útil d = u/VBAT_HAT con PWM_BITS bits, tensión aplicada VBAT·d y zona
+% muerta U_DZ del motor. Aquí queda IDEAL (PWM_BITS = Inf, U_DZ = DZ_HAT = 0), así que no cambia
+% las métricas de la sección 10 de la nota.
+% sim/tst_004_pwm_actuador.m la varía. El giro del cuerpo sale de sim/perfil_cuerpo.m.
+%
+% Con solo_parametros = true antes de correrlo, solo deja en el workspace los parámetros, el RST
+% y la referencia, y termina sin construir ni simular (así lo usa tst_004_pwm_actuador.m).
 
 raiz = fileparts(fileparts(mfilename('fullpath')));
 if isempty(raiz), raiz = pwd; end
 mdl  = 'lazo_camara_l3';
+addpath(fullfile(raiz, 'sim'));   % perfil_cuerpo.m
 
 %% ------------------------------------------------------------ parámetros (los de la nota)
 D2R = pi/180; R2D = 180/pi;
@@ -37,6 +47,12 @@ UMAX   = 6;         % saturación del actuador [V] — Sin fuente en raw/: 2S 18
 Kc     = 30;        % ganancia de velocidad [rad/(s·V)] — Sin fuente en raw/: régimen 1 de L-07 (S1)
 tau    = 0.1;       % constante de tiempo [s] — Sin fuente en raw/: régimen 1 de L-07 (S1)
 Kc_hat = Kc;        % ganancia que usa la prealimentación (L3 sin adaptar)
+% Etapa PWM ideal (siempre se reinicia aquí; TST-004 la varía con su propio script)
+PWM_BITS = Inf;     % bits del ciclo útil del ESP32 (Inf = sin cuantizar)
+VBAT     = 7.4;     % tensión real de la batería [V] — Sin fuente en raw/: 2S 18650 nominal
+VBAT_HAT = 7.4;     % tensión que supone el firmware al calcular d = u/VBAT_HAT [V]
+U_DZ     = 0;       % zona muerta del motor (fricción estática) [V]
+DZ_HAT   = 0;       % compensación de zona muerta del firmware: u + DZ_HAT·sign(u) [V]
 WN = 20; ZETA = 0.7;            % polos deseados del lazo
 bias_g = 0.5*D2R;               % sesgo del giróscopo [rad/s] (S3, supuesto)
 sig_g  = 0.1*D2R;               % ruido del giróscopo por muestra (S3)
@@ -70,6 +86,11 @@ fprintf('RST:  R = [%s]\n      S = [%s]\n      T = [%s]\n', num2str(R, '%.4f  ')
 dt = T/NSUB;  t = (0:dt:TF+T)';
 sref = min(max((t - 30)/1, 0), 1);
 ref_data = [t, (90*D2R)*(0.5 - 0.5*cos(pi*sref))];       % giro de 90° a los 30 s (C11), 1 s
+
+if exist('solo_parametros', 'var') && solo_parametros   % lo pide tst_004_pwm_actuador.m
+    clear solo_parametros
+    return
+end
 
 %% ------------------------------------------------------------ modelo de Simulink
 construir_modelo(mdl, raiz);
@@ -125,32 +146,7 @@ fprintf('Listo: modelo en sim/%s.slx (escenario %s en el workspace).\n', mdl, es
 
 
 %% ============================================================ funciones locales
-function [psib_data, wb_data, ab_data] = perfil_cuerpo(esc, t, dt, D2R)
-% Giro del cuerpo (S4 de la nota), con semilla fija. S1: sin giro neto; S2: giro continuo.
-rng(1);
-if strcmp(esc, 'S1')
-    wt = 2*pi*0.4; zt = 0.15;
-    x = zeros(size(t)); v = zeros(size(t));
-    for i = 2:numel(t)
-        v(i) = v(i-1) + (-wt^2*x(i-1) - 2*zt*wt*v(i-1))*dt + sqrt(dt)*randn;
-        x(i) = x(i-1) + v(i)*dt;
-    end
-    sc = (10*D2R)/std(x); x = x*sc; v = v*sc;
-    wb = (40*D2R)*(2*pi*0.3)*cos(2*pi*0.3*t) + (15*D2R)*(2*pi*1.1)*cos(2*pi*1.1*t + 1) + v;
-    psib = (40*D2R)*sin(2*pi*0.3*t) + (15*D2R)*sin(2*pi*1.1*t + 1) + x;
-else
-    tou = 0.5; sig = 15*D2R; g = zeros(size(t));
-    for i = 2:numel(t)
-        g(i) = g(i-1) - g(i-1)/tou*dt + sig*sqrt(2*dt/tou)*randn;
-    end
-    spin = (30 + 60*min(max(t - 5, 0), 1))*D2R;           % 30 -> 90 °/s al abrir paneles
-    spin(t < 5) = 30*D2R;
-    wb = spin + (20*D2R)*(2*pi*0.5)*cos(2*pi*0.5*t) + g;
-    psib = cumsum(wb)*dt;
-end
-ab = gradient(wb, dt);
-psib_data = [t, psib];  wb_data = [t, wb];  ab_data = [t, ab];
-end
+% perfil_cuerpo (giro del cuerpo, S4) vive en sim/perfil_cuerpo.m.
 
 function construir_modelo(mdl, raiz)
 % Arma el diagrama de bloques con un color por función.
@@ -210,6 +206,22 @@ aw = blk(mdl, 'simulink/Math Operations/Sum', sprintf('CONTROL anti-windup\nu - 
 % ---------------- ACTUADOR
 act = blk(mdl, 'simulink/Discontinuities/Saturation', sprintf('ACTUADOR\npuente H, |u| <= 6 V'), C.act, ...
     'UpperLimit', 'UMAX', 'LowerLimit', '-UMAX');
+
+% ---------------- ACTUADOR PWM del ESP32 (TST-004): d = u/Vbat supuesta, N bits, Vbat real, zona muerta
+sub = sprintf('ACTUADOR PWM\nESP32 + puente H\nd = u sobre Vbat, N bits, zona muerta');
+PW = subsis(mdl, sub, C.act, {'u'}, {'u_aplicada'});
+sgn  = blk(PW.path, 'simulink/Math Operations/Sign', 'signo de u', C.act);
+g_c  = blk(PW.path, 'simulink/Math Operations/Gain', 'compensación DZ_HAT', C.act, 'Gain', 'DZ_HAT');
+s_c  = blk(PW.path, 'simulink/Math Operations/Sum', 'u + DZ_HAT signo(u)', C.act, 'Inputs', '++');
+g_d  = blk(PW.path, 'simulink/Math Operations/Gain', 'd = u sobre VBAT_HAT', C.act, 'Gain', '1/VBAT_HAT');
+q_d  = blk(PW.path, 'simulink/Discontinuities/Quantizer', 'ciclo útil de N bits', C.act, ...
+    'QuantizationInterval', 'max(2^-PWM_BITS, eps)');
+g_v  = blk(PW.path, 'simulink/Math Operations/Gain', 'VBAT d', C.act, 'Gain', 'VBAT');
+dz   = blk(PW.path, 'simulink/Discontinuities/Dead Zone', 'zona muerta del motor', C.act, ...
+    'LowerValue', '-U_DZ', 'UpperValue', 'U_DZ');
+une(PW.path, PW.i(1), 1, s_c, 1); une(PW.path, PW.i(1), 1, sgn, 1); une(PW.path, sgn, 1, g_c, 1);
+une(PW.path, g_c, 1, s_c, 2); une(PW.path, s_c, 1, g_d, 1); une(PW.path, g_d, 1, q_d, 1); une(PW.path, q_d, 1, g_v, 1);
+une(PW.path, g_v, 1, dz, 1); une(PW.path, dz, 1, PW.o(1), 1);
 
 % ---------------- PLANTA: motor + cámara
 sub = sprintf('PLANTA\nmotor + cámara\ntau th'''' + th'' = Kc u - tau psi_b''''');
@@ -278,10 +290,11 @@ we_ = blk(mdl, 'simulink/User-Defined Functions/Fcn', sprintf('MEDICIÓN\nenvolv
 sc_ = blk(mdl, 'simulink/Math Operations/Sum', sprintf('MEDICIÓN\ne control = psi_c_est - psi_ref'), C.med, 'Inputs', '+-');
 wc_ = blk(mdl, 'simulink/User-Defined Functions/Fcn', sprintf('MEDICIÓN\nenvolver e control'), C.med, 'Expression', '180/pi*atan2(sin(u(1)),cos(u(1)))');
 sco = blk(mdl, 'simulink/Sinks/Scope', sprintf('MEDICIÓN\nerror (°) real y de control'), C.med, 'NumInputPorts', '2');
-scu = blk(mdl, 'simulink/Sinks/Scope', sprintf('MEDICIÓN\nu (V)'), C.med);
+scu = blk(mdl, 'simulink/Sinks/Scope', sprintf('MEDICIÓN\nu (V) pedida y aplicada'), C.med, 'NumInputPorts', '2');
 t1 = blk(mdl, 'simulink/Sinks/To Workspace', 'e_deg', C.med, 'VariableName', 'e_deg', 'SaveFormat', 'Timeseries', 'SampleTime', 'T');
 t2 = blk(mdl, 'simulink/Sinks/To Workspace', 'ec_deg', C.med, 'VariableName', 'ec_deg', 'SaveFormat', 'Timeseries', 'SampleTime', 'T');
 t3 = blk(mdl, 'simulink/Sinks/To Workspace', 'u_V', C.med, 'VariableName', 'u_V', 'SaveFormat', 'Timeseries', 'SampleTime', 'T');
+t4 = blk(mdl, 'simulink/Sinks/To Workspace', 'u_pwm_V', C.med, 'VariableName', 'u_pwm_V', 'SaveFormat', 'Timeseries', 'SampleTime', 'T');
 
 % ---------------- conexiones del nivel superior (con nombre de señal)
 une(mdl, ref, 1, K.h, 1, 'psi_ref');
@@ -290,9 +303,11 @@ une(mdl, aw, 1, K.h, 3, 'u_rst aplicada');
 une(mdl, K.h, 1, su, 1, 'u_rst');
 une(mdl, ff, 1, su, 2, 'u_ff');
 une(mdl, su, 1, act, 1, 'u pedida');
-une(mdl, act, 1, G.h, 1, 'u (V)');
+une(mdl, act, 1, PW.h, 1, 'u (V)');
+une(mdl, PW.h, 1, G.h, 1, 'u aplicada (V)');
 une(mdl, act, 1, aw, 1); une(mdl, ff, 1, aw, 2);
 une(mdl, act, 1, scu, 1); une(mdl, act, 1, t3, 1);
+une(mdl, PW.h, 1, scu, 2); une(mdl, PW.h, 1, t4, 1);
 une(mdl, P.h, 3, G.h, 2, 'alfa_b');
 une(mdl, P.h, 1, G.h, 3, 'psi_b');
 une(mdl, P.h, 2, Sn.h, 1, 'w_b');
@@ -310,14 +325,14 @@ une(mdl, sc_, 1, wc_, 1); une(mdl, wc_, 1, sco, 2, 'e control (°)'); une(mdl, w
 
 % ---------------- orden automático y leyenda de colores
 fprintf('Bloques conectados; ordenando el diagrama...\n');
-for s = {P.path, K.path, G.path, Sn.path, E.path, mdl}
+for s = {P.path, K.path, PW.path, G.path, Sn.path, E.path, mdl}
     try, Simulink.BlockDiagram.arrangeSystem(s{1}); catch err, fprintf('  arrangeSystem: %s\n', err.message); end
 end
 fprintf('Diagrama ordenado; leyenda...\n');
 pos = cell2mat(get_param(find_system(mdl, 'SearchDepth', 1, 'Type', 'block'), 'Position'));
 x0 = min(pos(:, 1));  y0 = max(pos(:, 4)) + 40;
 ley = {'ref', 'Referencia'; 'pert', 'Perturbación (giro del cuerpo)'; 'ctrl', 'Controlador RST y anti-windup'; ...
-       'ff', 'Prealimentación del giróscopo'; 'act', 'Actuador (saturación)'; 'plan', 'Planta: motor + cámara'; ...
+       'ff', 'Prealimentación del giróscopo'; 'act', 'Actuador (saturación y PWM)'; 'plan', 'Planta: motor + cámara'; ...
        'sens', 'Sensores'; 'est', 'Estimador de rumbo'; 'med', 'Medición y salidas'};
 tit = Simulink.Annotation(mdl, 'Lazo L3 de la cámara · colores por función (Control/diseno-estabilizacion-camara.md)');
 tit.Position = [x0, y0, x0 + 600, y0 + 20];  tit.FontWeight = 'bold';

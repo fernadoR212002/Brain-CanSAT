@@ -32,6 +32,7 @@ $$
   - servo de ±90°: rompe C8 el 21,4 % del tiempo, casi todo después del giro;
   - servo de ±180°: máximo de 10,71°;
   - con giro continuo (S2): ninguno de los dos cumple.
+- **M2.** [TST-004](../Pruebas/tst-004-salida-pwm-actuador.md) volvió a simular el servo de 180° con el pulso real del ESP32 (0,6 a 2,4 ms a 50 Hz, con 8 o 16 bits) y con un servo más lento (260 °/s y banda de 2°). Ningún caso cumple C8 (TST-004·M8). La orden pide más de ±90° el 25,42 % del tiempo en S1 y el 51,93 % en S2: el límite es el recorrido, no la resolución del PWM.
 
 ## Evaluación
 

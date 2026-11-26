@@ -1,0 +1,12 @@
+magnitud,valor,unidad,fuente
+K_rumbo,0.00483151354828,1,"Riccati discreta, ganancia de corrección"
+K_sesgo,-0.00110842368691,1/s,"Riccati discreta, ganancia de corrección"
+l1_eq,0.483151354828,1/s,K_rumbo / T
+l2_eq,0.110842368691,1/s²,-K_sesgo / T
+frecuencia_natural_eq,0.332929975656,rad/s,raíz cuadrada de l2_eq
+amortiguamiento_eq,0.725605067365,1,l1_eq / (2 · frecuencia_natural_eq)
+desviacion_rumbo,0.0625581807129,°,covarianza posterior estacionaria
+desviacion_sesgo,0.0208779907979,°/s,covarianza posterior estacionaria
+l1_actual,0.7,1/s,sim/diseno-estabilizacion-camara.py: simulate()
+l2_actual,0.25,1/s²,sim/diseno-estabilizacion-camara.py: simulate()
+frecuencia_natural_actual,0.5,rad/s,sim/diseno-estabilizacion-camara.py: simulate()
